@@ -1,0 +1,16 @@
+{
+  "name": "low-code",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "docs:dev": "pnpm -r --filter=@nimble-ui/docs run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "packages/utils",
+    "packages/drag",
+    "packages/move"
+  ]
+}
