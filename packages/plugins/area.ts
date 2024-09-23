@@ -1,9 +1,9 @@
-import type { Plugin } from "./types"
+import type { Plugin } from "../drag/types"
 
 export function areaPlugin(): Plugin {
   return {
-    enforce: 'move',
-    fun(data) {
+    name: "area-plugin",
+    move(data) {
       console.log(data)
     },
   }

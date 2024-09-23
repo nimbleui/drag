@@ -11,7 +11,7 @@ const defaultData = {
   endX: 0, // 鼠标抬起x轴的距离
   endY: 0, // 鼠标抬起Y轴的距离
   isMove: false, // 是否移动
-  target: null
+  target: undefined
 }
 
 export function elDrag(el: ElType, options?: OptionsType) {

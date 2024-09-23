@@ -28,7 +28,7 @@ export interface DataTypes {
   endX: number; // 鼠标抬起x轴的距离
   endY: number; // 鼠标抬起Y轴的距离
   isMove: boolean; // 是否移动
-  target?: Element | null // 当前移动的元素
+  target?: Element // 当前移动的元素
 }
 
 export type LimitInfoType = { l: number; r: number; t: number; b: number; }
