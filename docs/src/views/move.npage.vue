@@ -1,26 +1,32 @@
 
 <template>
   <div ref="warpRef" class="warp">
-    <div class="move"></div>
-    <div class="move"></div>
-    <div class="move"></div>
+    <div data-drag-info="move" class="move"></div>
+    <div data-drag-info="move" class="move"></div>
+    <div data-drag-info="move" class="move"></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { drag, movePlugin } from '@nimble-ui/drag';
+import { drag, movePlugin, sizePlugin} from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
 
 const warpRef = ref<HTMLElement>()
-
 const getEl = () => warpRef.value!
 
 drag(getEl, {
+  prevent: true,
   boundary: getEl,
-  agencyTarget: (el) => (el.classList.contains('move') ? el : false),
-  plugins: [movePlugin()],
+  agencyTarget: (el) => {
+    const dataset = (el as HTMLElement).dataset
+    if (dataset.dragInfo == 'dot' || dataset.dragInfo == 'move') {
+      return el
+    }
+    return false
+  },
+  plugins: [movePlugin(), sizePlugin()],
 })
 
 </script>
@@ -29,7 +35,7 @@ drag(getEl, {
 .warp {
   height: 100vh;
   width: 100vw;
-  // position: relative;
+  position: relative;
 
   .move {
     position: absolute;

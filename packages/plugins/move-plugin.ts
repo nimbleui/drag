@@ -16,22 +16,39 @@ const dotSite = {
 interface Options {
   borderColor?: string;
   dotColor?: string;
+  size?: boolean;
+  agencyTarget?: (el: Element) => Element | undefined | false | void
 }
 
-function createElement(target: HTMLElement, options?: Options) {
-  let borderEl = target.querySelector(".drag-border");
-  if (borderEl) return borderEl;
+// 移除当前以外的元素
+function removeEl() {
+  const els = document.querySelectorAll(".drag-border");
+  for (let i = 0; i < els.length; i++) {
+    const el = els[i];
+    el.parentElement?.removeChild(el)
+  }
+}
 
+function createElement(target: HTMLElement, isDot: boolean, options?: Options) {
+  // 获取是否存在圆点
+  let borderEl = target.querySelector(".drag-border");
+  // 判断是否点击圆点
+  const isClickDot = target.dataset.dragInfo == 'dot'
+  if (borderEl || isClickDot) return borderEl;
+
+  removeEl()
   borderEl = document.createElement('div');
-  borderEl.className = 'drag-border'
-  const color = options?.borderColor || '#1677ff'
-  Object.keys(dotSite).forEach((site) => {
-    const el = document.createElement("span");
-    el.setAttribute('data-drag-site', site);
-    el.setAttribute("data-drag-dot", 'drag-dot');
-    el.setAttribute("style", `${BORER_SITE_STYLE_COMMON}${dotSite[site]}border: 1px solid ${color};background:${options?.dotColor || '#a2c9ff'}`)
-    borderEl.appendChild(el)
-  })
+  borderEl.className = 'drag-border';
+  const color = options?.borderColor || '#1677ff';
+  if (isDot) {
+    Object.keys(dotSite).forEach((site) => {
+      const el = document.createElement("span");
+      el.setAttribute('data-drag-site', site);
+      el.setAttribute("data-drag-info", 'dot');
+      el.setAttribute("style", `${BORER_SITE_STYLE_COMMON}${dotSite[site]}border: 1px solid ${color};background:${options?.dotColor || '#a2c9ff'}`)
+      borderEl.appendChild(el)
+    })
+  }
 
   borderEl.setAttribute('style',`${BORDER_STYLE}border: 1px solid ${color}`)
   target.appendChild(borderEl)
@@ -41,15 +58,16 @@ function createElement(target: HTMLElement, options?: Options) {
 export function movePlugin(options?: Options): Plugin {
   return {
     name: "move-plugin",
-    down({ data }, done) {
+    runRequire: (target) => target.dataset.dragInfo == 'move',
+    down({ data, citePlugins }, done) {
       const el = data.target as HTMLElement;
       const { offsetLeft: l, offsetTop: t } = el;
-      createElement(el, options)
+      createElement(el, citePlugins['size-plugin'], options)
       done({ l, t });
     },
-    move({ data, value }) {
+    move({ data, pluginValue }) {
       const { target, disX, disY } = data;
-      const { l, t } = value['move-plugin-down']
+      const { l, t } = pluginValue['move-plugin-down']
       const el = target as HTMLElement;
       el.style.top = `${disY + t}px`;
       el.style.left = `${disX + l}px`;

@@ -1,10 +1,11 @@
-import type { OptionsType, ElType, DataTypes, MouseTouchEvent, CallbackReturnValue } from "@nimble-ui/move"
+import type { OptionsType, ElType, DataTypes, MouseTouchEvent } from "@nimble-ui/move"
 export { ElType, OptionsType, DataTypes, MouseTouchEvent }
 
 export interface PluginOptions {
   data: DataTypes;
-  e: MouseTouchEvent;
-  value: Record<string, any>;
+  e: MouseTouchEvent; // 事件对象
+  pluginValue: Record<string, any>; // 插件返回的值
+  citePlugins: Record<string, boolean>; // 记录已引用的插件
 }
 
 type PluginReturnValue = (data: any) => void
@@ -36,8 +37,15 @@ export interface Plugin {
    * @param done 保存值给其他回调函数用
    */
   up?: (data: PluginOptions, done: PluginReturnValue) => void;
+  /**
+   * 执行的条件
+   * @param target 事件源
+   * @param e 事件对象
+   * @returns 
+   */
+  runRequire?: (target: HTMLElement, e: MouseTouchEvent) => boolean;
 }
 
 export interface ConfigTypes extends OptionsType {
-  plugins?: Plugin[]
+  plugins?: Plugin[] // 插件
 }
