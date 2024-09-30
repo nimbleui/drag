@@ -17,7 +17,7 @@ interface Options {
   borderColor?: string;
   dotColor?: string;
   size?: boolean;
-  agencyTarget?: (el: Element) => Element | undefined | false | void
+  updateSite?: (data: { x: number; y: number, id?: number | string }) => void
 }
 
 // 移除当前以外的元素
@@ -29,6 +29,13 @@ function removeEl() {
   }
 }
 
+/**
+ * 创建元素
+ * @param target 目标元素 
+ * @param isDot 是否创建点
+ * @param options 插件的参数
+ * @returns 
+ */
 function createElement(target: HTMLElement, isDot: boolean, options?: Options) {
   // 获取是否存在圆点
   let borderEl = target.querySelector(".drag-border");
@@ -55,6 +62,11 @@ function createElement(target: HTMLElement, isDot: boolean, options?: Options) {
   return borderEl
 }
 
+/**
+ * 移动插件
+ * @param options 
+ * @returns 
+ */
 export function movePlugin(options?: Options): Plugin {
   return {
     name: "move-plugin",
@@ -69,8 +81,12 @@ export function movePlugin(options?: Options): Plugin {
       const { target, disX, disY } = data;
       const { l, t } = pluginValue['move-plugin-down']
       const el = target as HTMLElement;
-      el.style.top = `${disY + t}px`;
-      el.style.left = `${disX + l}px`;
+      const y = disY + t;
+      const x = disX + l;
+      el.style.top = `${y}px`;
+      el.style.left = `${x}px`;
+
+      options?.updateSite?.({x, y, id: el.dataset['dragId'] })
     },
   }
 }
