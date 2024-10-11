@@ -6,9 +6,8 @@ export function sizePlugin(options?: Options): Plugin {
   return {
     name: "size-plugin",
     runRequire: (target) => target.dataset.dragInfo == 'dot',
-    down({ data }, done) {
-      const el = data.target as HTMLElement
-      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = el;
+    down({ moveEl }, done) {
+      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = moveEl!;
       done({ l, t, w, h });
     },
     move({ data, pluginValue }) {

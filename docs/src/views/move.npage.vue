@@ -37,12 +37,11 @@ drag(getEl, {
     }
     return false
   },
+  changeSiteOrSize(target, data) {
+    console.log(data)
+  },
   plugins: [
-    movePlugin({
-      updateSite(data) {
-        console.log(data)
-      },
-    }),
+    movePlugin(),
     sizePlugin()
   ],
 })

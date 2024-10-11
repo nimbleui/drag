@@ -1,5 +1,6 @@
 import { DataTypes, elDrag, MouseTouchEvent } from "@nimble-ui/move"
 import type { ConfigTypes, Plugin } from "./types"
+import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue } from "@nimble-ui/utils"
 
 /**
  * 执行插件
@@ -8,7 +9,7 @@ import type { ConfigTypes, Plugin } from "./types"
  * @returns 
  */
 function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
-  return (type: 'down' | 'move' | 'up', data: { data: DataTypes, e: MouseTouchEvent, citePlugins: Record<string, boolean> }) => {
+  return (type: 'down' | 'move' | 'up', data: { data: DataTypes, e: MouseTouchEvent, citePlugins: Record<string, boolean>, moveEl: HTMLElement | null }) => {
     plugins.forEach((plugin) => {
       const checked = plugin.runRequire?.(data.data.target as HTMLElement, data.e) ?? true
       if (!checked) return
@@ -31,9 +32,26 @@ function getCitePlugins(plugins: Plugin[]) {
   }, {} as Record<string, boolean>)
 }
 
-function getMoveDOMSite(target?: Element) {
-  if (!target) return
-  
+/**
+ * 获取移动元素
+ * @param target 
+ * @returns 
+ */
+function getMoveDOM(target?: Element) {
+  if (!target) return null
+  return getParentTarget(target, (el) => el.dataset.dragInfo == 'move')
+}
+
+/**
+ * 获取移动元素的位置信息
+ * @param target 
+ * @returns 
+ */
+function getMoveDOMSite(target: HTMLElement | null, options: ConfigTypes) {
+  if (!target) return null
+  const scale = isFunctionOrValue(options.scale)
+  const { top, left, width, height } = getBoundingClientRectByScale(target, scale);
+  return {top, left, width, height}
 }
 
 export function drag(el: () => Element, config: ConfigTypes) {
@@ -45,11 +63,14 @@ export function drag(el: () => Element, config: ConfigTypes) {
   return elDrag(el, {
     ...options,
     down(data, e) {
-      pluginType('down', { data, e, citePlugins })
+      const moveEl = getMoveDOM(data.target)
+      pluginType('down', { data, e, citePlugins, moveEl })
     },
     move(data, e) {
-      pluginType('move', { data, e, citePlugins })
-      getMoveDOMSite(data.target)
+      const moveEl = getMoveDOM(data.target)
+      const site = getMoveDOMSite(moveEl, options)
+      pluginType('move', { data, e, citePlugins, moveEl })
+      options.changeSiteOrSize?.(moveEl, site)
     },
   })
 }

@@ -1,4 +1,4 @@
-import type { OptionsType, ElType, DataTypes, MouseTouchEvent } from "@nimble-ui/move"
+import type { OptionsType, BaseOptions, ElType, DataTypes, MouseTouchEvent } from "@nimble-ui/move"
 export { ElType, OptionsType, DataTypes, MouseTouchEvent }
 
 export interface PluginOptions {
@@ -6,6 +6,7 @@ export interface PluginOptions {
   e: MouseTouchEvent; // 事件对象
   pluginValue: Record<string, any>; // 插件返回的值
   citePlugins: Record<string, boolean>; // 记录已引用的插件
+  moveEl: HTMLElement | null; // 移动的元素
 }
 
 type PluginReturnValue = (data: any) => void
@@ -46,6 +47,14 @@ export interface Plugin {
   runRequire?: (target: HTMLElement, e: MouseTouchEvent) => boolean;
 }
 
-export interface ConfigTypes extends OptionsType {
+interface SiteInfo {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
+export interface ConfigTypes extends BaseOptions {
   plugins?: Plugin[] // 插件
+  // 改变位置或者大小触发这个方法
+  changeSiteOrSize?:(target: HTMLElement | null, data: SiteInfo | null) => void;
 }

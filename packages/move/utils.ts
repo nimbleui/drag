@@ -1,9 +1,5 @@
-import { isFunction, isTouchEvent } from "@nimble-ui/utils"
+import { isFunctionOrValue, isTouchEvent } from "@nimble-ui/utils"
 import { ElType, MouseTouchEvent, OptionsType } from "./types"
-
-export function isFunctionOrValue<T>(val: T): T extends (...args: any) => any ? ReturnType<T> : T {
-  return isFunction(val) ? val() : val;
-}
 
 /**
  * 获取鼠标的x、y坐标

@@ -1,5 +1,6 @@
+import { isFunctionOrValue } from "@nimble-ui/utils";
 import type { DataTypes, ElType, MouseTouchEvent, OptionsType, LimitInfoType, CallbackReturnValue } from "./types";
-import { getTarget, isFunctionOrValue, numScale, sunBoundaryValue } from "./utils";
+import { getTarget, numScale, sunBoundaryValue } from "./utils";
 
 const defaultData = {
   startX: 0, // 按下鼠标x轴位置

@@ -17,7 +17,7 @@ interface Options {
   borderColor?: string;
   dotColor?: string;
   size?: boolean;
-  updateSite?: (data: { x: number; y: number, id?: number | string }) => void
+  updateSite?: (data: { x: number; y: number, id?: number | string, target: HTMLElement } ) => void
 }
 
 // 移除当前以外的元素
@@ -86,7 +86,7 @@ export function movePlugin(options?: Options): Plugin {
       el.style.top = `${y}px`;
       el.style.left = `${x}px`;
 
-      options?.updateSite?.({x, y, id: el.dataset['dragId'] })
+      options?.updateSite?.({x, y, id: el.dataset['dragId'], target: el })
     },
   }
 }
