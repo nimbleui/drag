@@ -29,6 +29,7 @@ export interface DataTypes {
   endY: number; // 鼠标抬起Y轴的距离
   isMove: boolean; // 是否移动
   target?: Element // 当前移动的元素
+  binElement?: Element // 绑定的元素
 }
 
 export type LimitInfoType = { l: number; r: number; t: number; b: number; }

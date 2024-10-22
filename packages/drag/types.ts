@@ -7,6 +7,7 @@ export interface PluginOptions {
   pluginValue: Record<string, any>; // 插件返回的值
   citePlugins: Record<string, boolean>; // 记录已引用的插件
   moveEl: HTMLElement | null; // 移动的元素
+  scale: number; // 缩放比例
 }
 
 type PluginReturnValue = (data: any) => void

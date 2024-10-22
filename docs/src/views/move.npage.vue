@@ -7,14 +7,14 @@
       data-drag-info="move"
       :data-drag-id="item.id"
       class="move"
-      :style="{left: `${item.left}px`, top: `${item.top}px`}"
+      :style="{left: `${item.left}px`, top: `${item.top}px`, transform: `rotate(${item.angle || 0}deg)`}"
     ></div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { drag, movePlugin, sizePlugin} from '@nimble-ui/drag';
+import { drag, movePlugin, sizePlugin, guidelinesPlugin } from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
 
@@ -38,11 +38,12 @@ drag(getEl, {
     return false
   },
   changeSiteOrSize(target, data) {
-    console.log(data)
+    // console.log(data)
   },
   plugins: [
     movePlugin(),
-    sizePlugin()
+    sizePlugin(),
+    guidelinesPlugin()
   ],
 })
 

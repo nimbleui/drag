@@ -1,5 +1,5 @@
-import { DataTypes, elDrag, MouseTouchEvent } from "@nimble-ui/move"
-import type { ConfigTypes, Plugin } from "./types"
+import { elDrag } from "@nimble-ui/move"
+import type { ConfigTypes, Plugin, PluginOptions } from "./types"
 import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue } from "@nimble-ui/utils"
 
 /**
@@ -9,7 +9,7 @@ import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue } from
  * @returns 
  */
 function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
-  return (type: 'down' | 'move' | 'up', data: { data: DataTypes, e: MouseTouchEvent, citePlugins: Record<string, boolean>, moveEl: HTMLElement | null }) => {
+  return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'pluginValue'>) => {
     plugins.forEach((plugin) => {
       const checked = plugin.runRequire?.(data.data.target as HTMLElement, data.e) ?? true
       if (!checked) return
@@ -64,13 +64,18 @@ export function drag(el: () => Element, config: ConfigTypes) {
     ...options,
     down(data, e) {
       const moveEl = getMoveDOM(data.target)
-      pluginType('down', { data, e, citePlugins, moveEl })
+      const scale = isFunctionOrValue(options.scale) || 1
+      pluginType('down', { data, e, citePlugins, moveEl, scale })
+      return { moveEl, scale}
     },
-    move(data, e) {
-      const moveEl = getMoveDOM(data.target)
+    move(data, e, value) {
+      const { moveEl } = value.down
       const site = getMoveDOMSite(moveEl, options)
-      pluginType('move', { data, e, citePlugins, moveEl })
+      pluginType('move', { data, e, citePlugins, ...value.down })
       options.changeSiteOrSize?.(moveEl, site)
+    },
+    up(data, e, value) {
+      pluginType('up', { data, e, citePlugins, ...value.down })
     },
   })
 }

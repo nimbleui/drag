@@ -12,9 +12,13 @@ export default {
 defineProps({})
 </script>
 
-<style lang="scss" scoped>
-* {
-  padding: 0;
-  margin: 0;
-}
+<style lang="scss">
+// html, body {
+//   margin: 0;
+//   padding: 0;
+// }
+// * {
+//   padding: 0;
+//   margin: 0;
+// }
 </style>

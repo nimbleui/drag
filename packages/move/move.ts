@@ -24,13 +24,14 @@ export function elDrag(el: ElType, options?: OptionsType) {
   }
 
   // 按下事件
-  const mousedown = (e: MouseTouchEvent) => {
+  function mousedown (e: MouseTouchEvent) {
     // 执行参数更新
     updateOptions?.(_options);
 
     const res = getTarget(e, el, _options);
     if (!res) return
     data.target = res
+    data.binElement = this
 
     const { clientX, clientY } = numScale(e, _options);
     Object.assign(data, { isMove: true, startX: clientX, startY: clientY })
@@ -52,7 +53,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
     if (value) _value.callbackReturnValue.down = value
   }
 
-  const mousemove = (e: MouseTouchEvent) => {
+  function mousemove (e: MouseTouchEvent) {
     if (!data.isMove) return
     // 执行参数更新
     updateOptions?.(_options);
@@ -76,7 +77,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
     if (value) callbackReturnValue.move = value
   }
 
-  const mouseup = (e: MouseTouchEvent) => {
+  function mouseup(e: MouseTouchEvent) {
     if (!data.isMove) return
     // 执行参数更新
     updateOptions?.(_options);
