@@ -1,5 +1,5 @@
 import { elDrag } from "@nimble-ui/move"
-import type { ConfigTypes, Plugin, PluginOptions } from "./types"
+import type { ConfigTypes, MoveRectList, Plugin, PluginOptions } from "./types"
 import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue } from "@nimble-ui/utils"
 
 /**
@@ -51,7 +51,25 @@ function getMoveDOMSite(target: HTMLElement | null, options: ConfigTypes) {
   if (!target) return null
   const scale = isFunctionOrValue(options.scale)
   const { top, left, width, height } = getBoundingClientRectByScale(target, scale);
-  return {top, left, width, height}
+  return { top, left, width, height }
+}
+
+/**
+ * 获取排除拖拽元素的所有可移动的的元素位置、大小
+ * @param target 当前拖拽的元素
+ * @param canvas 画布元素
+ */
+function getAllMoveSiteInfo(target: Element | null, scale: number, canvas?: Element) {
+  const moves = canvas?.querySelectorAll('[data-drag-info="move"]')
+  const moveSite: MoveRectList = []
+  if (!moves) return moveSite
+  for (let i = 0; i < moves.length; i++) {
+    const el = moves[i];
+    if (el == target) continue;
+    const { width, height, left, top } = getBoundingClientRectByScale(el, scale);
+    moveSite.push({ width, height, left, top, el })
+  }
+  return moveSite
 }
 
 export function drag(el: () => Element, config: ConfigTypes) {
@@ -63,16 +81,20 @@ export function drag(el: () => Element, config: ConfigTypes) {
   return elDrag(el, {
     ...options,
     down(data, e) {
-      const moveEl = getMoveDOM(data.target)
+      const { binElement } = data
+      const target = getMoveDOM(data.target)
       const scale = isFunctionOrValue(options.scale) || 1
-      pluginType('down', { data, e, citePlugins, moveEl, scale })
-      return { moveEl, scale}
+      const moves = getAllMoveSiteInfo(target, scale, binElement) 
+      const targetSite = getMoveDOMSite(target, options)!;
+
+      pluginType('down', { data, e, citePlugins, target, scale, moves, targetSite })
+      return { target, scale, moves }
     },
     move(data, e, value) {
-      const { moveEl } = value.down
-      const site = getMoveDOMSite(moveEl, options)
+      const { target } = value.down
+      const site = getMoveDOMSite(target, options)
       pluginType('move', { data, e, citePlugins, ...value.down })
-      options.changeSiteOrSize?.(moveEl, site)
+      options.changeSiteOrSize?.(target, site)
     },
     up(data, e, value) {
       pluginType('up', { data, e, citePlugins, ...value.down })

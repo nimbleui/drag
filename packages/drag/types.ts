@@ -1,13 +1,24 @@
 import type { OptionsType, BaseOptions, ElType, DataTypes, MouseTouchEvent } from "@nimble-ui/move"
 export { ElType, OptionsType, DataTypes, MouseTouchEvent }
 
+export interface MoveRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  el: Element;
+}
+export type MoveRectList = MoveRect[]
+
 export interface PluginOptions {
   data: DataTypes;
   e: MouseTouchEvent; // 事件对象
   pluginValue: Record<string, any>; // 插件返回的值
   citePlugins: Record<string, boolean>; // 记录已引用的插件
-  moveEl: HTMLElement | null; // 移动的元素
+  target: HTMLElement | null; // 移动的元素
   scale: number; // 缩放比例
+  moves: MoveRectList; // 排除当前拖拽以外的可移动元素位置信息
+  targetSite: Omit<MoveRect, 'el'>; // 当前拖拽元素位置信息
 }
 
 type PluginReturnValue = (data: any) => void
