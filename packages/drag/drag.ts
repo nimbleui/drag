@@ -1,6 +1,6 @@
 import { elDrag } from "@nimble-ui/move"
-import type { ConfigTypes, MoveRectList, Plugin, PluginOptions } from "./types"
-import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue } from "@nimble-ui/utils"
+import type { ConfigTypes, MoveRectList, Plugin, PluginOptions, ReturnData } from "./types"
+import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue, objectTransform } from "@nimble-ui/utils"
 
 /**
  * 执行插件
@@ -9,11 +9,15 @@ import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue } from
  * @returns 
  */
 function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
-  return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'pluginValue'>) => {
+  return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'pluginValue' | "target">) => {
     plugins.forEach((plugin) => {
-      const checked = plugin.runRequire?.(data.data.target as HTMLElement, data.e) ?? true
-      if (!checked) return
-      plugin[type]?.({...data, pluginValue}, (val) => {
+      const { e } = data
+      const target = getParentTarget(e.target as HTMLElement, (el) => {
+        return el.dataset.dragInfo === plugin.runTarge
+      })
+      if (!target) return
+
+      plugin[type]?.({...data, target, pluginValue}, (val) => {
         pluginValue[`${plugin.name}-${type}`] = val
       })
     })
@@ -47,11 +51,10 @@ function getMoveDOM(target?: Element) {
  * @param target 
  * @returns 
  */
-function getMoveDOMSite(target: HTMLElement | null, options: ConfigTypes) {
+function getMoveDOMSite(target: Element | null, options: ConfigTypes) {
   if (!target) return null
   const scale = isFunctionOrValue(options.scale)
-  const { top, left, width, height } = getBoundingClientRectByScale(target, scale);
-  return { top, left, width, height }
+  return getBoundingClientRectByScale(target, scale)
 }
 
 /**
@@ -66,11 +69,13 @@ function getAllMoveSiteInfo(target: Element | null, scale: number, canvas?: Elem
   for (let i = 0; i < moves.length; i++) {
     const el = moves[i];
     if (el == target) continue;
-    const { width, height, left, top } = getBoundingClientRectByScale(el, scale);
-    moveSite.push({ width, height, left, top, el })
+    const { width, height, left, top, bottom, right } = getBoundingClientRectByScale(el, scale);
+    moveSite.push({ width, height, left, top, el, bottom, right })
   }
   return moveSite
 }
+
+const keys = ['disX', 'disY', 'startX', 'startY', 'moveX', 'moveY', 'isMove'] as Array<'disX' | 'disY' |'startX'| 'startY'| 'moveX'| 'moveY'| 'isMove'>
 
 export function drag(el: () => Element, config: ConfigTypes) {
   const { plugins = [], ...options } = config
@@ -81,23 +86,31 @@ export function drag(el: () => Element, config: ConfigTypes) {
   return elDrag(el, {
     ...options,
     down(data, e) {
-      const { binElement } = data
-      const target = getMoveDOM(data.target)
-      const scale = isFunctionOrValue(options.scale) || 1
-      const moves = getAllMoveSiteInfo(target, scale, binElement) 
-      const targetSite = getMoveDOMSite(target, options)!;
+      const values = objectTransform(data, keys);
+      // 获取当前移动的元素
+      const moveEl = getMoveDOM(e.target as Element);
+      // 缩放比例
+      const scale = isFunctionOrValue(options.scale) || 1;
+      // 移动元素的宽高、大小
+      const targetSite = getMoveDOMSite(moveEl, options)!;
+      const moves = getAllMoveSiteInfo(moveEl, scale, data.binElement);
+      // 画布位置信息
+      const canvasSite = getBoundingClientRectByScale(data.binElement!, scale)
 
-      pluginType('down', { data, e, citePlugins, target, scale, moves, targetSite })
-      return { target, scale, moves }
+      pluginType('down', { canvasEl: data.binElement!, ...values, e, citePlugins, moveEl, scale, moves, targetSite, canvasSite })
+      return { moveEl, scale, moves, targetSite, canvasSite }
     },
     move(data, e, value) {
-      const { target } = value.down
-      const site = getMoveDOMSite(target, options)
-      pluginType('move', { data, e, citePlugins, ...value.down })
-      options.changeSiteOrSize?.(target, site)
+      const down = value.down as ReturnData
+      const site = getMoveDOMSite(down.moveEl, options)
+      const values = objectTransform(data, keys)
+      pluginType('move', { canvasEl: data.binElement!,  e, citePlugins, ...values, ...down })
+      down.moveEl && options.changeSiteOrSize?.(down.moveEl, site)
     },
     up(data, e, value) {
-      pluginType('up', { data, e, citePlugins, ...value.down })
+      const down = value.down as ReturnData
+      const values = objectTransform(data, keys)
+      pluginType('up', { canvasEl: data.binElement!,  e, citePlugins, ...values, ...down })
     },
   })
 }

@@ -39,8 +39,5 @@ export function getBoundingClientRectByScale(el: Element | HTMLElement, scale = 
     (val) => val / scale
   );
 
-  return {
-    ...rect,
-    ...values
-  } as DOMRect;
+  return values;
 }

@@ -1,5 +1,4 @@
-import type { Plugin } from "../drag/types"
-import { getBoundingClientRectByScale } from "../utils";
+import type { Plugin, MoveRectList, MoveRect } from "../drag/types";
 interface Options {
   color?: string; // 辅助线的元素
   threshold?: number; // 吸附
@@ -59,18 +58,11 @@ function createLine(el: Element, options?: Options) {
  * @param el 画布
  * @returns 
  */
-function getMoveElementSite(target: Element, scale: number, el?: Element) {
-  const moves = el?.querySelectorAll('[data-drag-info="move"]')
-  const sourceRect = getBoundingClientRectByScale(target, scale)
-  if (!moves) return { sourceRect, lines: { x: [], y: [] } };
-
+function getMoveElementSite(moves: MoveRectList, sourceRect: Omit<MoveRect, 'el'>) {
   const { height, width } = sourceRect
   const lines: { x: LineType, y: LineType } = { x: [], y: [] }
   for (let i = 0; i < moves.length || 0; i++) {
-    const item = moves[i];
-    if (target == item) continue;
-    
-    const { left: l, top: t, width: w, height: h, right: r, bottom: b } = getBoundingClientRectByScale(item, scale);
+    const { left: l, top: t, width: w, height: h, right: r, bottom: b } = moves[i];
     const halfW = w / 2;
     const halfH = h / 2;
 
@@ -107,17 +99,16 @@ export function guidelinesPlugin(options?: Options): Plugin {
   const markLines: MarkLineType = Object.assign({}, defaultMarkLine)
   return {
     name: 'guidelines-plugin',
-    down({ data, scale, target }, done) {
-      const { binElement } = data
-      const { elY, elX } = createLine(binElement!, options)
+    runTarge: 'move',
+    down({ canvasEl, moves, targetSite }, done) {
+      const { elY, elX } = createLine(canvasEl, options)
 
-      done({ elY, elX, ...getMoveElementSite(target!, scale, binElement) })
+      done({ elY, elX, ...getMoveElementSite(moves, targetSite) })
     },
-    move({ data, pluginValue, scale, target }) {
-      const { disX, disY, binElement } = data;
+    move({ disX, disY, pluginValue, target, canvasSite }) {
       const { elY, elX, sourceRect, lines } = pluginValue['guidelines-plugin-down'];
       // 获取画布距离左边和上边的距离
-      const { left, top } = getBoundingClientRectByScale(binElement!, scale)
+      const { left, top } = canvasSite
       Object.assign(markLines, defaultMarkLine);
 
       const y = sourceRect.top + disY

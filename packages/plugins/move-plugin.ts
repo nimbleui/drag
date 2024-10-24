@@ -1,6 +1,6 @@
 import type { Plugin } from "../drag/types"
 
-const BORDER_STYLE = `position: absolute;top: 0;left: 0;width: 100%;height: 100%;pointer-events: none;margin: -1px 0 0 -1px;`;
+const BORDER_STYLE = `position: absolute;top: 0;left: 0;width: 100%;height: 100%;pointer-events: none;box-sizing: border-box;`;
 const BORER_SITE_STYLE_COMMON = `position: absolute;width: 10px;height: 10px;border-radius: 50%;box-sizing: border-box;z-index: 4;pointer-events: all;`;
 const dotSite = {
   "lt": `top: -5px; left: -5px; cursor: nw-resize;`,
@@ -70,15 +70,14 @@ function createElement(target: HTMLElement, isDot: boolean, options?: Options) {
 export function movePlugin(options?: Options): Plugin {
   return {
     name: "move-plugin",
-    runRequire: (target) => target.dataset.dragInfo == 'move',
-    down({ data, citePlugins }, done) {
-      const el = data.target as HTMLElement;
+    runTarge: 'move',
+    down({ target, citePlugins }, done) {
+      const el = target as HTMLElement;
       const { offsetLeft: l, offsetTop: t } = el;
       createElement(el, citePlugins['size-plugin'], options)
       done({ l, t });
     },
-    move({ data, pluginValue }) {
-      const { target, disX, disY } = data;
+    move({ target, disX, disY, pluginValue }) {
       const { l, t } = pluginValue['move-plugin-down']
       const el = target as HTMLElement;
       const y = disY + t;

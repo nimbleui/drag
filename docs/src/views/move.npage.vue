@@ -42,7 +42,7 @@ drag(getEl, {
   },
   plugins: [
     movePlugin(),
-    sizePlugin(),
+    // sizePlugin(),
     guidelinesPlugin()
   ],
 })

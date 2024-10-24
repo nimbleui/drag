@@ -27,16 +27,14 @@ const sin = (deg: number) => Math.sin(degToRadian(deg));
 export function sizePlugin(options?: Options): Plugin {
   return {
     name: "size-plugin",
-    runRequire: (target) => target.dataset.dragInfo == 'dot',
+    runTarge: "dot",
     down({ moveEl }, done) {
-      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = moveEl!;
+      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = moveEl as HTMLElement;
       done({ l, t, w, h });
     },
-    move({ data, pluginValue, moveEl }) {
-      const { target, disX, disY } = data;
+    move({ pluginValue, target, moveEl }) {
       const { l, t, w, h } = pluginValue['size-plugin-down']
-      const el = target as HTMLElement;
-      const direction = el.dataset.dragSite
+      const direction = target.dataset.dragSite
       const angle = getRotationDegrees(moveEl!)
       
       console.log(direction)
