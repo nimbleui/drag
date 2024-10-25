@@ -13,7 +13,7 @@ function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
     plugins.forEach((plugin) => {
       const { e } = data
       const target = getParentTarget(e.target as HTMLElement, (el) => {
-        return el.dataset.dragInfo === plugin.runTarge
+        return el.dataset.dragType === plugin.runTarge
       })
       if (!target) return
 
@@ -43,7 +43,7 @@ function getCitePlugins(plugins: Plugin[]) {
  */
 function getMoveDOM(target?: Element) {
   if (!target) return null
-  return getParentTarget(target, (el) => el.dataset.dragInfo == 'move')
+  return getParentTarget(target, (el) => el.dataset.dragType == 'move')
 }
 
 /**
@@ -63,7 +63,7 @@ function getMoveDOMSite(target: Element | null, options: ConfigTypes) {
  * @param canvas 画布元素
  */
 function getAllMoveSiteInfo(target: Element | null, scale: number, canvas?: Element) {
-  const moves = canvas?.querySelectorAll('[data-drag-info="move"]')
+  const moves = canvas?.querySelectorAll('[data-drag-type="move"]')
   const moveSite: MoveRectList = []
   if (!moves) return moveSite
   for (let i = 0; i < moves.length; i++) {

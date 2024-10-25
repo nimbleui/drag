@@ -40,7 +40,7 @@ function createElement(target: HTMLElement, isDot: boolean, options?: Options) {
   // 获取是否存在圆点
   let borderEl = target.querySelector(".drag-border");
   // 判断是否点击圆点
-  const isClickDot = target.dataset.dragInfo == 'dot'
+  const isClickDot = target.dataset.dragType == 'dot'
   if (borderEl || isClickDot) return borderEl;
 
   removeEl()
@@ -51,7 +51,7 @@ function createElement(target: HTMLElement, isDot: boolean, options?: Options) {
     Object.keys(dotSite).forEach((site) => {
       const el = document.createElement("span");
       el.setAttribute('data-drag-site', site);
-      el.setAttribute("data-drag-info", 'dot');
+      el.setAttribute("data-drag-type", 'dot');
       el.setAttribute("style", `${BORER_SITE_STYLE_COMMON}${dotSite[site]}border: 1px solid ${color};background:${options?.dotColor || '#a2c9ff'}`)
       borderEl.appendChild(el)
     })
@@ -72,6 +72,7 @@ export function movePlugin(options?: Options): Plugin {
     name: "move-plugin",
     runTarge: 'move',
     down({ target, citePlugins }, done) {
+      console.log(target, '2222')
       const el = target as HTMLElement;
       const { offsetLeft: l, offsetTop: t } = el;
       createElement(el, citePlugins['size-plugin'], options)

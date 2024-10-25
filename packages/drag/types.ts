@@ -13,29 +13,44 @@ export interface MoveRect {
 export type MoveRectList = MoveRect[]
 
 export interface ReturnData {
-  moveEl: Element | null; // 移动的元素
-  scale: number; // 缩放比例
-  moves: MoveRectList; // 排除当前拖拽以外的可移动元素位置信息
-  targetSite: Omit<MoveRect, 'el'>; // 当前拖拽元素位置信息
-  canvasSite: Omit<MoveRect, 'el'>; // 画布元素位置信息
+  /** 移动的元素 */
+  moveEl: Element | null;
+  /** 缩放比例 */
+  scale: number;
+  /** 排除当前拖拽以外的可移动元素位置信息 */
+  moves: MoveRectList;
+  /** 当前拖拽元素位置信息 */
+  targetSite: Omit<MoveRect, 'el'>;
+  /** 画布元素位置信息 */
+  canvasSite: Omit<MoveRect, 'el'>;
 }
 
 export interface PluginOptions extends ReturnData {
-  canvasEl: Element; // 画布元素
-  disX: number; // 鼠标移动x轴的距离
-  disY: number; // 移动鼠标y轴位置
-  startX: number; // 按下鼠标x轴位置
-  startY: number; // 按下鼠标y轴位置
-  moveX: number; // 移动鼠标x轴位置
-  moveY: number; // 移动鼠标y轴位置
-  isMove: boolean; // 是否移动
-  e: MouseTouchEvent; // 事件对象
-  pluginValue: Record<string, any>; // 插件返回的值
-  citePlugins: Record<string, boolean>; // 记录已引用的插件
-  target: HTMLElement; // 事件元素
+  /**  画布元素 */
+  canvasEl: Element;
+  /** 鼠标移动x轴的距离 */
+  disX: number;
+  /** 移动鼠标y轴位置 */
+  disY: number;
+  /** 按下鼠标x轴位置 */
+  startX: number;
+  /** 按下鼠标y轴位置 */
+  startY: number;
+  /** 移动鼠标x轴位置 */
+  moveX: number;
+  /** 移动鼠标y轴位置 */
+  moveY: number;
+  /** 是否移动 */
+  isMove: boolean;
+  /** 事件对象 */
+  e: MouseTouchEvent;
+  /** 插件返回的值 */
+  pluginValue: Record<string, any>;
+  /** 记录已引用的插件 */
+  citePlugins: Record<string, boolean>;
+  /** 事件元素 */
+  target: HTMLElement;
 }
-
-
 
 type PluginReturnValue = (data: any) => void
 export type RunTarge =  'move' | 'dot' | 'canvas' | 'rotate'

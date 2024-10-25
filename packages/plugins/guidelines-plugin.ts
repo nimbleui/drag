@@ -52,10 +52,9 @@ function createLine(el: Element, options?: Options) {
 }
 
 /**
- * 获取所有移动元素的跟当前移动元素的位置
- * @param target 移动元素
- * @param scale 缩放比例
- * @param el 画布
+ * 计算碰撞值
+ * @param moves 
+ * @param sourceRect 
  * @returns 
  */
 function getMoveElementSite(moves: MoveRectList, sourceRect: Omit<MoveRect, 'el'>) {
