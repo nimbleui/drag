@@ -23,6 +23,8 @@ export interface ReturnData {
   targetSite: Omit<MoveRect, 'el'>;
   /** 画布元素位置信息 */
   canvasSite: Omit<MoveRect, 'el'>;
+  /** 点击的元素 */
+  eventTarget: HTMLElement
 }
 
 export interface PluginOptions extends ReturnData {

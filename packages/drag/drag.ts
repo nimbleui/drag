@@ -11,10 +11,19 @@ import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue, objec
 function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
   return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'pluginValue' | "target">) => {
     plugins.forEach((plugin) => {
-      const { e } = data
-      const target = getParentTarget(e.target as HTMLElement, (el) => {
-        return el.dataset.dragType === plugin.runTarge
-      })
+      const { eventTarget } = data;
+      const { dragType } = eventTarget.dataset;
+      
+      let target: HTMLElement | null = null;
+      if (plugin.runTarge == 'move') {
+        target = getParentTarget(eventTarget, (el) => el.dataset.dragType === "move");
+      } else if (plugin.runTarge == 'dot') {
+        dragType == 'dot' && (target = eventTarget)
+      } else if (plugin.runTarge == 'canvas') {
+        dragType == 'canvas' && (target = eventTarget)
+      } else if (plugin.runTarge == "rotate") {
+        dragType == 'rotate' && (target = eventTarget)
+      }
       if (!target) return
 
       plugin[type]?.({...data, target, pluginValue}, (val) => {
@@ -95,10 +104,23 @@ export function drag(el: () => Element, config: ConfigTypes) {
       const targetSite = getMoveDOMSite(moveEl, options)!;
       const moves = getAllMoveSiteInfo(moveEl, scale, data.binElement);
       // 画布位置信息
-      const canvasSite = getBoundingClientRectByScale(data.binElement!, scale)
+      const canvasSite = getBoundingClientRectByScale(data.binElement!, scale);
+      // 点击的元素
+      const eventTarget = e.target as HTMLElement;
 
-      pluginType('down', { canvasEl: data.binElement!, ...values, e, citePlugins, moveEl, scale, moves, targetSite, canvasSite })
-      return { moveEl, scale, moves, targetSite, canvasSite }
+      pluginType('down', {
+        e,
+        canvasEl: data.binElement!,
+        ...values,
+        citePlugins,
+        moveEl,
+        scale,
+        moves,
+        targetSite,
+        canvasSite,
+        eventTarget,
+      })
+      return { moveEl, scale, moves, targetSite, canvasSite, eventTarget }
     },
     move(data, e, value) {
       const down = value.down as ReturnData

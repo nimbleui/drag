@@ -4,7 +4,7 @@
     <div
       v-for="item in list"
       :key="item.id"
-      data-drag-info="move"
+      data-drag-type="move"
       :data-drag-id="item.id"
       class="move"
       :style="{left: `${item.left}px`, top: `${item.top}px`, transform: `rotate(${item.angle || 0}deg)`}"
@@ -29,14 +29,7 @@ const getEl = () => warpRef.value!
 
 drag(getEl, {
   prevent: true,
-  boundary: getEl,
-  agencyTarget: (el) => {
-    const dataset = (el as HTMLElement).dataset
-    if (dataset.dragInfo == 'dot' || dataset.dragInfo == 'move') {
-      return el
-    }
-    return false
-  },
+  // boundary: getEl,
   changeSiteOrSize(target, data) {
     // console.log(data)
   },

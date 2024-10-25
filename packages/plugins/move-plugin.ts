@@ -71,16 +71,15 @@ export function movePlugin(options?: Options): Plugin {
   return {
     name: "move-plugin",
     runTarge: 'move',
-    down({ target, citePlugins }, done) {
-      console.log(target, '2222')
-      const el = target as HTMLElement;
+    down({ moveEl, citePlugins }, done) {
+      const el = moveEl as HTMLElement;
       const { offsetLeft: l, offsetTop: t } = el;
       createElement(el, citePlugins['size-plugin'], options)
       done({ l, t });
     },
-    move({ target, disX, disY, pluginValue }) {
+    move({ moveEl, disX, disY, pluginValue }) {
       const { l, t } = pluginValue['move-plugin-down']
-      const el = target as HTMLElement;
+      const el = moveEl as HTMLElement;
       const y = disY + t;
       const x = disX + l;
       el.style.top = `${y}px`;

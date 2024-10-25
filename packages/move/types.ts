@@ -13,7 +13,7 @@ export interface OptionsType extends BaseOptions {
   down?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => void;
   move?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => void;
   up?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => void;
-  updateOptions?: (options: Omit<OptionsType, 'updateOptions'>) => void
+  setTarget?: (e: MouseTouchEvent) => Element
 }
 
 export type MouseTouchEvent = MouseEvent | TouchEvent
