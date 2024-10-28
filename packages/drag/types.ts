@@ -10,24 +10,30 @@ export interface MoveRect {
   height: number;
   el: Element;
 }
-export type MoveRectList = MoveRect[]
+export type MoveRectList = MoveRect[];
 
-export interface ReturnData {
+interface Common {
   /** 移动的元素 */
-  moveEl: Element | null;
+  currentEl: Element | null;
   /** 缩放比例 */
   scale: number;
   /** 排除当前拖拽以外的可移动元素位置信息 */
-  moves: MoveRectList;
+  moveSite: MoveRectList;
   /** 当前拖拽元素位置信息 */
-  targetSite: Omit<MoveRect, 'el'>;
+  currentSite: Omit<MoveRect, 'el'> | null;
   /** 画布元素位置信息 */
   canvasSite: Omit<MoveRect, 'el'>;
   /** 点击的元素 */
-  eventTarget: HTMLElement
+  eventTarget: HTMLElement;
+  /** 元素类型 */
+  type: RunTarge | null;
 }
 
-export interface PluginOptions extends ReturnData {
+export interface ReturnData extends Common {
+  createEl: () => Element | void;
+}
+
+export interface PluginOptions extends Common {
   /**  画布元素 */
   canvasEl: Element;
   /** 鼠标移动x轴的距离 */
@@ -48,14 +54,10 @@ export interface PluginOptions extends ReturnData {
   e: MouseTouchEvent;
   /** 插件返回的值 */
   pluginValue: Record<string, any>;
-  /** 记录已引用的插件 */
-  citePlugins: Record<string, boolean>;
-  /** 事件元素 */
-  target: HTMLElement;
 }
 
-type PluginReturnValue = (data: any) => void
-export type RunTarge =  'move' | 'dot' | 'canvas' | 'rotate'
+type PluginReturnValue = (data: any) => void;
+export type RunTarge = 'move' | 'dot' | 'canvas' | 'rotate';
 export interface Plugin {
   /**
    * @description 插件的名称

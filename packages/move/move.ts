@@ -16,17 +16,21 @@ const defaultData = {
 }
 
 export function elDrag(el: ElType, options?: OptionsType) {
-  const { updateOptions, ..._options } = options || {};
+  const { setTarget, ..._options } = options || {};
   const data: DataTypes = Object.assign({}, defaultData);
   const _value: { limitInfo: LimitInfoType | null; callbackReturnValue: CallbackReturnValue} = {
     limitInfo: null,
     callbackReturnValue: {}
   }
 
+  const changeTarget = () => {
+    
+  }
+
   // 按下事件
   function mousedown (e: MouseTouchEvent) {
     // 执行参数更新
-    updateOptions?.(_options);
+    setTarget?.(e);
 
     const res = getTarget(e, el, _options);
     if (!res) return
@@ -56,7 +60,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
   function mousemove (e: MouseTouchEvent) {
     if (!data.isMove) return
     // 执行参数更新
-    updateOptions?.(_options);
+    // updateOptions?.(_options);
     _options?.stop && e.stopPropagation(); // 阻止事件冒泡
     _options?.prevent && e.preventDefault(); // 阻止默认事件
 
@@ -80,7 +84,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
   function mouseup(e: MouseTouchEvent) {
     if (!data.isMove) return
     // 执行参数更新
-    updateOptions?.(_options);
+    // updateOptions?.(_options);
     _options?.stop && e.stopPropagation();
     _options?.prevent && e.preventDefault();
     

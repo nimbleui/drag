@@ -8,13 +8,15 @@
       :data-drag-id="item.id"
       class="move"
       :style="{left: `${item.left}px`, top: `${item.top}px`, transform: `rotate(${item.angle || 0}deg)`}"
-    ></div>
+    >
+    <div class="content"></div>
+  </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { drag, movePlugin, sizePlugin, guidelinesPlugin } from '@nimble-ui/drag';
+import { drag, movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin } from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
 
@@ -35,8 +37,9 @@ drag(getEl, {
   },
   plugins: [
     movePlugin(),
-    // sizePlugin(),
-    guidelinesPlugin()
+    sizePlugin(),
+    guidelinesPlugin(),
+    // rotatePlugin()
   ],
 })
 
@@ -53,6 +56,11 @@ drag(getEl, {
     width: 150px;
     height: 50px;
     background-color: red;
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

@@ -7,7 +7,8 @@ interface Options {}
  * @param element 目标元素
  * @returns 
  */
-export function getRotationDegrees(element: Element) {
+export function getRotationDegrees(element: Element | null) {
+  if (!element) return 0;
   const style = window.getComputedStyle(element);
   const matrix = style.transform;
   if (matrix !== 'none') {
@@ -28,14 +29,15 @@ export function sizePlugin(options?: Options): Plugin {
   return {
     name: "size-plugin",
     runTarge: "dot",
-    down({ moveEl }, done) {
-      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = moveEl as HTMLElement;
+    down({ currentEl }, done) {
+      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = currentEl as HTMLElement;
       done({ l, t, w, h });
     },
-    move({ pluginValue, target, moveEl }) {
+    move({ pluginValue, e, currentEl }) {
       const { l, t, w, h } = pluginValue['size-plugin-down']
+      const target = e.target as HTMLElement;
       const direction = target.dataset.dragSite
-      const angle = getRotationDegrees(moveEl!)
+      const angle = getRotationDegrees(currentEl)
       
       console.log(direction)
       console.log('angle', angle)
