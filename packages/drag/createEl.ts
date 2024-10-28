@@ -13,7 +13,7 @@ const dotSite = {
   "r": `right: -5px; top: 50%; transform: translateY(-50%); cursor: e-resize;`
 }
 
-const ROTATE_STYLE = `position: absolute;width: 15px;height: 15px;border-radius: 50%;transform: translateX(-50%);left: 50%;top: -25px;`
+const ROTATE_STYLE = `pointer-events: all;position: absolute;width: 15px;height: 15px;border-radius: 50%;transform: translateX(-50%);left: 50%;top: -25px;`
 
 interface Options {
   canvas: Element;
@@ -43,7 +43,7 @@ export function createElement(options: Options) {
       // 创建可以旋转按钮
       if (rotate) {
         const el = document.createElement("div");
-        el.setAttribute("data-drag-rotate", 'true')
+        el.setAttribute("data-drag-type", 'rotate')
         el.setAttribute("style", `${ROTATE_STYLE}background: #1677ff;`);
         content.appendChild(el);
       }

@@ -2,10 +2,10 @@ import { Plugin } from "../drag";
 
 export function rotatePlugin(): Plugin {
   return {
-    name: "rotatePlugin",
+    name: "rotate-plugin",
     runTarge: "rotate",
-    down({ targetSite }, done) {
-      const { width, height, left, top } = targetSite;
+    down({ currentSite }, done) {
+      const { width, height, left, top } = currentSite!;
       // 计算中心点
       const centerX = left + width / 2;
       const centerY = top + height / 2;
@@ -13,8 +13,11 @@ export function rotatePlugin(): Plugin {
     },
     move({ moveX, moveY, pluginValue }) {
       const { centerX, centerY } = pluginValue['rotate-plugin-down'];
-      console.log(centerX, centerY)
-      console.log(moveX, moveY)
+      const diffX = centerX - moveX;
+      const diffY = centerY - moveY;
+      const radians = Math.atan2(diffY, diffX);
+      const deg = (radians * 180) / Math.PI - 90
+      console.log((deg + 360) % 360)
     },
   }
 }

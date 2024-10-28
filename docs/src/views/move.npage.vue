@@ -39,7 +39,7 @@ drag(getEl, {
     movePlugin(),
     sizePlugin(),
     guidelinesPlugin(),
-    // rotatePlugin()
+    rotatePlugin()
   ],
 })
 

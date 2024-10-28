@@ -11,9 +11,8 @@ import { createElement } from "./createEl"
  */
 function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
   return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'pluginValue' | "target">) => {
+    const elType = data.type || 'canvas';
     plugins.forEach((plugin) => {
-      const { type: elType } = data;
-      console.log(elType)
       if (elType !== plugin.runTarge) return
 
       plugin[type]?.({...data, pluginValue}, (val) => {
@@ -104,7 +103,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       // 点击的元素
       const eventTarget = e.target as HTMLElement;
       // 创建点
-      const createEl= createElement({ ...usePlugins, target: currentEl, canvas: data.binElement!, rotate: true });
+      const createEl= createElement({ ...usePlugins, target: currentEl, canvas: data.binElement! });
       createEl()
 
       pluginType('down', {
