@@ -15,7 +15,7 @@ export function movePlugin(options?: Options): Plugin {
   return {
     name: "move-plugin",
     runTarge: 'move',
-    down({ currentEl, citePlugins }, done) {
+    down({ currentEl }, done) {
       if (!currentEl) return
       const { offsetLeft: l, offsetTop: t } = currentEl as HTMLElement;
       done({ l, t });

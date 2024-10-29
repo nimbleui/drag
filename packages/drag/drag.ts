@@ -64,8 +64,8 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
 
   let currentSite: Omit<MoveRect, 'el'> | null = null
   const moveSite: MoveRectList = [];
-
   if (!moves) return { moveSite, currentEl, currentSite, type: null };
+
   for (let i = 0; i < moves.length; i++) {
     const el = moves[i];
     const { width, height, left, top, bottom, right } = getBoundingClientRectByScale(el, scale);

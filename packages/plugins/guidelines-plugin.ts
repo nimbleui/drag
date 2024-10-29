@@ -90,7 +90,7 @@ function getMoveElementSite(moves: MoveRectList, sourceRect: Omit<MoveRect, 'el'
     lines.x.push({ showValue: r, value: r - width }); // 右对右
   }
 
-  return { sourceRect, lines }
+  return { lines }
 }
 
 export function guidelinesPlugin(options?: Options): Plugin {

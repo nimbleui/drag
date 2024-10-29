@@ -64,9 +64,9 @@ export interface Plugin {
    */
   name: string;
   /**
-   * 修改配置
+   * @description 鼠标在那种元素上才执行
    */
-  options?: (options: OptionsType) => void;
+  runTarge: RunTarge;
   /**
    * 鼠标按下执行
    * @param data 事件对象等
@@ -85,17 +85,6 @@ export interface Plugin {
    * @param done 保存值给其他回调函数用
    */
   up?: (data: PluginOptions, done: PluginReturnValue) => void;
-  /**
-   * 执行的条件
-   * @param target 事件源
-   * @param e 事件对象
-   * @returns 
-   */
-  runRequire?: (target: HTMLElement, e: MouseTouchEvent) => boolean;
-  /**
-   * @description 鼠标在那种元素上才执行
-   */
-  runTarge: RunTarge
 }
 
 interface SiteInfo {
