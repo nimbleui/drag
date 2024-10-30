@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { drag, movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin } from '@nimble-ui/drag';
+import { drag, movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin, groupPlugin } from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
 
@@ -39,7 +39,8 @@ drag(getEl, {
     movePlugin(),
     sizePlugin(),
     guidelinesPlugin(),
-    rotatePlugin()
+    rotatePlugin(),
+    groupPlugin()
   ],
 })
 
