@@ -1,4 +1,10 @@
-export function getRotationDegrees(element: Element) {
+/**
+ * 获取元素的旋转角度
+ * @param element 目标元素
+ * @returns 
+ */
+export function getRotationDegrees(element: Element | null) {
+  if (!element) return 0;
   const style = window.getComputedStyle(element);
   const matrix = style.transform;
   if (matrix !== 'none') {

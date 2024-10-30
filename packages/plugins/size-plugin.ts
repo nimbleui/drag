@@ -1,25 +1,7 @@
-import type { Plugin } from "../drag/types"
+import type { Plugin } from "../drag/types";
+import { getRotationDegrees } from "@nimble-ui/utils";
 
 interface Options {}
-
-/**
- * 获取元素的旋转角度
- * @param element 目标元素
- * @returns 
- */
-export function getRotationDegrees(element: Element | null) {
-  if (!element) return 0;
-  const style = window.getComputedStyle(element);
-  const matrix = style.transform;
-  if (matrix !== 'none') {
-    const values = matrix.split('(')[1].split(')')[0].split(',');
-    const a = +values[0];
-    const b = +values[1];
-    const angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
-    return angle < 0 ? angle + 360 : angle; // 将角度转换为正值
-  }
-  return 0; // 如果没有旋转，则返回0
-}
 
 const degToRadian = (deg: number) => (deg * Math.PI) / 180;
 const cos = (deg: number) => Math.cos(degToRadian(deg));
@@ -29,20 +11,118 @@ export function sizePlugin(options?: Options): Plugin {
   return {
     name: "size-plugin",
     runTarge: "dot",
-    down({ currentEl }, done) {
-      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = currentEl as HTMLElement;
-      done({ l, t, w, h });
-    },
-    move({ pluginValue, e, currentEl }) {
-      const { l, t, w, h } = pluginValue['size-plugin-down']
+    down({ currentEl, e }, done) {
       const target = e.target as HTMLElement;
-      const direction = target.dataset.dragSite
-      const angle = getRotationDegrees(currentEl)
-      
-      console.log(direction)
-      console.log('angle', angle)
-      // el.style.top = `${disY + t}px`;
-      // el.style.left = `${disX + l}px`;
+      const direction = target.dataset.dragSite;
+      const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = currentEl as HTMLElement;
+
+      done({ l, t, w, h, direction });
+    },
+    move({ disX, disY, pluginValue, currentEl }) {
+      const { l, t, w, h, direction } = pluginValue['size-plugin-down'];
+      const angle = getRotationDegrees(currentEl);
+      const result = handleRatio(disX, disY, direction, angle, { centerX: l + w / 2, centerY: t + h / 2, width: w, height: h });
+      const el = currentEl as HTMLElement;
+      el.style.left = `${result.left}px`;
+      el.style.top = `${result.top}px`;
+      el.style.height = `${result.height}px`;
+      el.style.width = `${result.width}px`;
     },
   }
 }
+
+const setValue = (size: number, delta: number, minSize = 0) => {
+  const value = size + delta;
+  if (value > minSize) {
+    size = value;
+  } else {
+    delta = minSize - size;
+    size = minSize;
+  }
+  return [size, delta];
+};
+
+type Rect = { centerX: number; centerY: number; width: number; height: number };
+const handleRatio = (deltaX: number, deltaY: number, type: string, rotate: number, rect: Rect) => {
+  const alpha = Math.atan2(deltaY, deltaX);
+  const deltaL = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  const beta = alpha - degToRadian(rotate);
+  let deltaW = deltaL * Math.cos(beta);
+  let deltaH = deltaL * Math.sin(beta);
+
+  let { centerX, centerY, width, height } = rect;
+  switch (type) {
+    case "lt": {
+      deltaW = -deltaW;
+      deltaH = -deltaH;
+      [width, deltaW] = setValue(width, deltaW);
+      [height, deltaH] = setValue(height, deltaH);
+
+      centerX -= (deltaW / 2) * cos(rotate) - (deltaH / 2) * sin(rotate);
+      centerY -= (deltaW / 2) * sin(rotate) + (deltaH / 2) * cos(rotate);
+      break;
+    }
+    case "t": {
+      deltaH = -deltaH;
+      [height, deltaH] = setValue(height, deltaH);
+
+      centerX += (deltaH / 2) * sin(rotate);
+      centerY -= (deltaH / 2) * cos(rotate);
+      break;
+    }
+    case "rt": {
+      deltaH = -deltaH;
+      [width, deltaW] = setValue(width, deltaW);
+      [height, deltaH] = setValue(height, deltaH);
+
+      centerX += (deltaW / 2) * cos(rotate) + (deltaH / 2) * sin(rotate);
+      centerY += (deltaW / 2) * sin(rotate) - (deltaH / 2) * cos(rotate);
+      break;
+    }
+    case "r": {
+      [width, deltaW] = setValue(width, deltaW);
+      // 左边固定
+      centerX += (deltaW / 2) * cos(rotate);
+      centerY += (deltaW / 2) * sin(rotate);
+      break;
+    }
+    case "rb": {
+      [width, deltaW] = setValue(width, deltaW);
+      [height, deltaH] = setValue(height, deltaH);
+
+      centerX += (deltaW / 2) * cos(rotate) - (deltaH / 2) * sin(rotate);
+      centerY += (deltaW / 2) * sin(rotate) + (deltaH / 2) * cos(rotate);
+      break;
+    }
+    case "b": {
+      [height, deltaH] = setValue(height, deltaH);
+      // 上边固定
+      centerX -= (deltaH / 2) * sin(rotate);
+      centerY += (deltaH / 2) * cos(rotate);
+      break;
+    }
+    case "lb": {
+      deltaW = -deltaW;
+      [width, deltaW] = setValue(width, deltaW);
+      [height, deltaH] = setValue(height, deltaH);
+
+      centerX -= (deltaW / 2) * cos(rotate) + (deltaH / 2) * sin(rotate);
+      centerY -= (deltaW / 2) * sin(rotate) - (deltaH / 2) * cos(rotate);
+      break;
+    }
+    case "l": {
+      deltaW = -deltaW;
+      [width, deltaW] = setValue(width, deltaW);
+      // 右边固定
+      centerX -= (deltaW / 2) * cos(rotate);
+      centerY -= (deltaW / 2) * sin(rotate);
+    }
+  }
+
+  return {
+    width: Math.round(Math.abs(width)),
+    height: Math.round(Math.abs(height)),
+    top: Math.round(centerY - Math.abs(height) / 2),
+    left: Math.round(centerX - Math.abs(width) / 2)
+  };
+};

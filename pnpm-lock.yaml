@@ -57,6 +57,12 @@ importers:
         specifier: workspace:^
         version: link:../utils
 
+  packages/plugins:
+    dependencies:
+      '@nimble-ui/utils':
+        specifier: workspace:^
+        version: link:../utils
+
   packages/utils: {}
 
 packages:
