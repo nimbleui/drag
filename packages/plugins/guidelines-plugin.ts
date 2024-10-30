@@ -104,13 +104,13 @@ export function guidelinesPlugin(options?: Options): Plugin {
 
       done({ elY, elX, ...getMoveElementSite(moveSite, currentSite!) })
     },
-    move({ disX, disY, pluginValue, currentEl, canvasSite }) {
-      const { elY, elX, sourceRect, lines } = pluginValue['guidelines-plugin-down'];
+    move({ disX, disY, pluginValue, currentEl, canvasSite, currentSite }) {
+      const { elY, elX, lines } = pluginValue['guidelines-plugin-down'];
       // 获取画布距离左边和上边的距离
       const { left, top } = canvasSite
       Object.assign(markLines, defaultMarkLine);
 
-      const y = sourceRect.top + disY
+      const y = currentSite!.top + disY
       for (let i = 0; i < lines.y.length; i++) {
         const { value, showValue } = lines.y[i];
         if (Math.abs(value - y) < threshold) {
@@ -119,7 +119,7 @@ export function guidelinesPlugin(options?: Options): Plugin {
           break;
         }
       }
-      const x = sourceRect.left + disX
+      const x = currentSite!.left + disX
       for (let i = 0; i < lines.x.length; i++) {
         const { value, showValue } = lines.x[i];
         if (Math.abs(value - x) < threshold) {
