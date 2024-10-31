@@ -1,6 +1,6 @@
 import type { Plugin } from "../drag/types";
 
-const STYLE = `display: block;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`
+const STYLE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`
 
 const createEl = (canvas: Element) => {
   let el = canvas.querySelector(".drag-group");
@@ -38,10 +38,36 @@ export function groupPlugin(): Plugin {
       groupEl.style.height = `${height}px`;
       done({ width, height, top, left });
     },
-    up({ funValue }) {
+    up({ moveSite, funValue, canvasSite }) {
       const { groupEl } = funValue.down;
+      const { width, height, top: t, left: l } = funValue.move;
+      const b = t + height;
+      const r = l + width;
 
-      groupEl.style.display = 'none';
+      // 过滤满足的条件
+      let minX = Infinity,
+        maxX = -Infinity,
+        minY = Infinity,
+        maxY = -Infinity;
+      const els: Element[] = []
+      moveSite.forEach((move) => {
+        const { top, left, bottom, right } = move;
+        if (t < top && b > bottom && l < left && r > right) {
+          els.push(move.el);
+          minX = Math.min(minX, left - canvasSite.left);
+          maxX = Math.max(maxX, right - canvasSite.left);
+          minY = Math.min(minY, top - canvasSite.top);
+          maxY = Math.max(maxY, bottom - canvasSite.top);
+        }
+      })
+      if (!els.length) {
+        groupEl.style.display = 'none';
+      } else {
+        groupEl.style.left = `${minX}px`;
+        groupEl.style.top = `${minY}px`;
+        groupEl.style.width = `${maxX - minX}px`;
+        groupEl.style.height = `${maxY - minY}px`;
+      }
     }
   }
 }
