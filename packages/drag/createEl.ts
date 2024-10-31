@@ -1,5 +1,3 @@
-import { MoveRect } from "./types"
-
 const BORDER_STYLE = `position: absolute;box-sizing: border-box;pointer-events: none;z-index: 99999;`;
 const BORER_SITE_STYLE_COMMON = `position: absolute;width: 10px;height: 10px;border-radius: 50%;box-sizing: border-box;z-index: 4;pointer-events: all;`;
 const dotSite = {

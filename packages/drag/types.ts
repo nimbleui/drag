@@ -52,8 +52,8 @@ export interface PluginOptions extends Common {
   isMove: boolean;
   /** 事件对象 */
   e: MouseTouchEvent;
-  /** 插件返回的值 */
-  pluginValue: Record<string, any>;
+  /** 函数的返回值 */
+  funValue: { down?: any; move?: any };
 }
 
 type PluginReturnValue = (data: any) => void;

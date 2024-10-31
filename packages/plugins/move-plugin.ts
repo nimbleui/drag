@@ -20,10 +20,10 @@ export function movePlugin(options?: Options): Plugin {
       const { offsetLeft: l, offsetTop: t } = currentEl as HTMLElement;
       done({ l, t });
     },
-    move({ currentEl, disX, disY, pluginValue }) {
+    move({ currentEl, disX, disY, funValue }) {
       if (!currentEl) return;
 
-      const { l, t } = pluginValue['move-plugin-down']
+      const { l, t } = funValue.down
       const y = disY + t;
       const x = disX + l;
       const el = currentEl as HTMLElement

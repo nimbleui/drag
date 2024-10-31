@@ -23,8 +23,8 @@ export function groupPlugin(): Plugin {
       const groupEl = createEl(canvasEl);
       done({ groupEl });
     },
-    move({ disX, disY, pluginValue, startX, startY, canvasSite }, done) {
-      const { groupEl } = pluginValue['group-plugin-down'];
+    move({ disX, disY, funValue, startX, startY, canvasSite }, done) {
+      const { groupEl } = funValue.down;
       const x = startX - canvasSite.left;
       const y = startY - canvasSite.top;
 
@@ -36,9 +36,10 @@ export function groupPlugin(): Plugin {
       groupEl.style.top = `${top}px`;
       groupEl.style.width = `${width}px`;
       groupEl.style.height = `${height}px`;
+      done({ width, height, top, left });
     },
-    up({ pluginValue }) {
-      const { groupEl } = pluginValue['group-plugin-down'];
+    up({ funValue }) {
+      const { groupEl } = funValue.down;
 
       groupEl.style.display = 'none';
     }

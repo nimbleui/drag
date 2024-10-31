@@ -18,8 +18,8 @@ export function sizePlugin(options?: Options): Plugin {
 
       done({ l, t, w, h, direction });
     },
-    move({ disX, disY, pluginValue, currentEl }) {
-      const { l, t, w, h, direction } = pluginValue['size-plugin-down'];
+    move({ disX, disY, funValue, currentEl }) {
+      const { l, t, w, h, direction } = funValue.down;
       const angle = getRotationDegrees(currentEl);
       const result = handleRatio(disX, disY, direction, angle, { centerX: l + w / 2, centerY: t + h / 2, width: w, height: h });
       const el = currentEl as HTMLElement;

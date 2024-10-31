@@ -104,8 +104,8 @@ export function guidelinesPlugin(options?: Options): Plugin {
 
       done({ elY, elX, ...getMoveElementSite(moveSite, currentSite!) })
     },
-    move({ disX, disY, pluginValue, currentEl, canvasSite, currentSite }) {
-      const { elY, elX, lines } = pluginValue['guidelines-plugin-down'];
+    move({ disX, disY, funValue, currentEl, canvasSite, currentSite }) {
+      const { elY, elX, lines } = funValue.down;
       // 获取画布距离左边和上边的距离
       const { left, top } = canvasSite
       Object.assign(markLines, defaultMarkLine);
@@ -145,8 +145,8 @@ export function guidelinesPlugin(options?: Options): Plugin {
         el && (el.style.left = `${x + markLines.diffX -left}px`)
       }
     },
-    up({ pluginValue }) {
-      const { elY, elX } = pluginValue['guidelines-plugin-down'];
+    up({ funValue }) {
+      const { elY, elX } = funValue.down;
       elX.style.display = "none";
       elY.style.display = "none";
     }

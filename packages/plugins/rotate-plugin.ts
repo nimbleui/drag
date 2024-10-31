@@ -11,8 +11,8 @@ export function rotatePlugin(): Plugin {
       const centerY = top + height / 2;
       done({ centerX, centerY })
     },
-    move({ moveX, moveY, pluginValue }) {
-      const { centerX, centerY } = pluginValue['rotate-plugin-down'];
+    move({ moveX, moveY, funValue }) {
+      const { centerX, centerY } = funValue.down;
       const diffX = centerX - moveX;
       const diffY = centerY - moveY;
       const radians = Math.atan2(diffY, diffX);

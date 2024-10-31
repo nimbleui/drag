@@ -9,14 +9,18 @@ import { createElement } from "./createEl"
  * @param pluginValue 插件返回值
  * @returns 
  */
-function handlePlugins(plugins: Plugin[], pluginValue: Record<string, any>) {
-  return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'pluginValue' | "target">) => {
+function handlePlugins(plugins: Plugin[]) {
+  const returnValue: Record<string, { down?: any; move?: any }> = {}
+  return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'funValue' | "target">) => {
     const elType = data.type || 'canvas';
     plugins.forEach((plugin) => {
       if (elType !== plugin.runTarge) return
+      if (!returnValue[plugin.name]) {
+        returnValue[plugin.name] = {}
+      }
 
-      plugin[type]?.({...data, pluginValue}, (val) => {
-        pluginValue[`${plugin.name}-${type}`] = val
+      plugin[type]?.({ ...data, funValue: returnValue[plugin.name] }, (val) => {
+        returnValue[plugin.name][type] = val
       })
     })
   }
@@ -86,8 +90,7 @@ const keys = ['disX', 'disY', 'startX', 'startY', 'moveX', 'moveY', 'isMove'] as
 
 export function drag(el: () => Element, config: ConfigTypes) {
   const { plugins = [], ...options } = config
-  const pluginValue: Record<string, any> = {}
-  const pluginType = handlePlugins(plugins, pluginValue)
+  const pluginType = handlePlugins(plugins)
   const usePlugins = getCitePlugins(plugins)
 
   return elDrag(el, {
