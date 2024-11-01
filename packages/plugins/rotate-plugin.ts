@@ -11,13 +11,13 @@ export function rotatePlugin(): Plugin {
       const centerY = top + height / 2;
       done({ centerX, centerY })
     },
-    move({ moveX, moveY, funValue }) {
+    move({ moveX, moveY, funValue, currentEl }) {
       const { centerX, centerY } = funValue.down;
       const diffX = centerX - moveX;
       const diffY = centerY - moveY;
       const radians = Math.atan2(diffY, diffX);
-      const deg = (radians * 180) / Math.PI - 90
-      console.log((deg + 360) % 360)
+      const deg = (radians * 180) / Math.PI - 90;
+      (currentEl as HTMLElement).style.transform = `rotate(${(deg + 360) % 360}deg)`;
     },
   }
 }

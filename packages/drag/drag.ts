@@ -1,6 +1,6 @@
 import { elDrag } from "@nimble-ui/move"
 import type { ConfigTypes, RunTarge, MoveRect, MoveRectList, Plugin, PluginOptions, ReturnData } from "./types"
-import { getBoundingClientRectByScale, getParentTarget, isFunctionOrValue, objectTransform } from "@nimble-ui/utils"
+import { getBoundingClientRectByScale, getParentTarget, getRotationDegrees, isFunctionOrValue, objectTransform } from "@nimble-ui/utils"
 import { createElement } from "./createEl"
 
 /**
@@ -14,14 +14,14 @@ function handlePlugins(plugins: Plugin[]) {
   return (type: 'down' | 'move' | 'up', data: Omit<PluginOptions, 'funValue' | "target">) => {
     const elType = data.type || 'canvas';
     plugins.forEach((plugin) => {
-      if (elType !== plugin.runTarge) return
-      if (!returnValue[plugin.name]) {
-        returnValue[plugin.name] = {}
-      }
+      const { runTarge, name } = plugin;
+      const checked = Array.isArray(runTarge) ? runTarge.includes(elType) : elType === runTarge;
+      if (!checked) return
 
-      plugin[type]?.({ ...data, funValue: returnValue[plugin.name] }, (val) => {
-        returnValue[plugin.name][type] = val
-      })
+      if (!returnValue[name]) returnValue[name] = {};
+      plugin[type]?.({ ...data, funValue: returnValue[name] }, (val) => {
+        returnValue[name][type] = val;
+      });
     })
   }
 }
@@ -33,7 +33,11 @@ function handlePlugins(plugins: Plugin[]) {
  */
 function getCitePlugins(plugins: Plugin[]) {
   return plugins.reduce((acc, cur) => {
-    acc[cur.runTarge] = true
+    if (Array.isArray(cur.runTarge)) {
+      cur.runTarge.forEach((value) => acc[value] = true)
+    } else {
+      acc[cur.runTarge] = true
+    }
     return acc
   }, {} as Record<RunTarge, boolean>)
 }
@@ -130,7 +134,8 @@ export function drag(el: () => Element, config: ConfigTypes) {
 
       if (down.currentEl) {
         const site = getBoundingClientRectByScale(down.currentEl, down.scale)
-        options.changeSiteOrSize?.(down.currentEl, site);
+        const angle = getRotationDegrees(down.currentEl)
+        options.changeSiteOrSize?.(down.currentEl, {...site, angle});
         down.createEl();
       }
     },

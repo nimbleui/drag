@@ -1,3 +1,5 @@
+import { getRotationDegrees } from "@nimble-ui/utils";
+
 const BORDER_STYLE = `position: absolute;box-sizing: border-box;pointer-events: none;z-index: 99999;`;
 const BORER_SITE_STYLE_COMMON = `position: absolute;width: 10px;height: 10px;border-radius: 50%;box-sizing: border-box;z-index: 4;pointer-events: all;`;
 const dotSite = {
@@ -12,22 +14,24 @@ const dotSite = {
 }
 
 const ROTATE_STYLE = `pointer-events: all;position: absolute;width: 15px;height: 15px;border-radius: 50%;transform: translateX(-50%);left: 50%;top: -25px;`
+const GROUP_STYE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`
 
 interface Options {
   canvas: Element;
   dot: boolean;
   rotate: boolean;
+  group: boolean;
   target: Element | null;
 }
 
 export function createElement(options: Options) {
   return () => {
-    const { canvas, dot, rotate, target } = options;
-    let content = canvas.querySelector("[data-drag-type='content']");
+    const { canvas, dot, rotate, target, group } = options;
+    let content = canvas.querySelector(".drag-mask");
 
     if (!content) {
       content = document.createElement("div");
-      content.setAttribute('data-drag-type', 'content')
+      content.classList.add("drag-mask")
       // 创建八个点
       if (dot) {
         Object.keys(dotSite).forEach((site) => {
@@ -41,10 +45,19 @@ export function createElement(options: Options) {
       // 创建可以旋转按钮
       if (rotate) {
         const el = document.createElement("div");
-        el.setAttribute("data-drag-type", 'rotate')
+        el.setAttribute("data-drag-type", 'rotate');
         el.setAttribute("style", `${ROTATE_STYLE}background: #1677ff;`);
         content.appendChild(el);
       }
+    }
+
+    // 创建组元素
+    let groupEl = canvas.querySelector("[data-drag-type='group']");
+    if (group && !groupEl) {
+      groupEl = document.createElement('div');
+      groupEl.setAttribute("data-drag-type", 'group');
+      groupEl.setAttribute("style", GROUP_STYE);
+      canvas.appendChild(groupEl);
     }
 
     // 判断有没有选择可以移动元素
@@ -53,7 +66,7 @@ export function createElement(options: Options) {
     }
     const t = target as HTMLElement
     content.setAttribute('style',
-      `${BORDER_STYLE}border: 1px solid #1677ff;top: ${t.offsetTop}px;left: ${t.offsetLeft}px;width: ${t.offsetWidth}px;height: ${t.offsetHeight}px;`);
+      `${BORDER_STYLE}border: 1px solid #1677ff;top: ${t.offsetTop}px;left: ${t.offsetLeft}px;width: ${t.offsetWidth}px;height: ${t.offsetHeight}px;transform: rotate(${getRotationDegrees(t)}deg);`);
     canvas.appendChild(content);
     return content;
   }

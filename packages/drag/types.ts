@@ -53,11 +53,11 @@ export interface PluginOptions extends Common {
   /** 事件对象 */
   e: MouseTouchEvent;
   /** 函数的返回值 */
-  funValue: { down?: any; move?: any };
+  funValue: { down?: any; move?: any, up?: any };
 }
 
 type PluginReturnValue = (data: any) => void;
-export type RunTarge = 'move' | 'dot' | 'canvas' | 'rotate';
+export type RunTarge = 'move' | 'dot' | 'canvas' | 'rotate' | 'group';
 export interface Plugin {
   /**
    * @description 插件的名称
@@ -66,7 +66,7 @@ export interface Plugin {
   /**
    * @description 鼠标在那种元素上才执行
    */
-  runTarge: RunTarge;
+  runTarge: RunTarge | RunTarge[];
   /**
    * 鼠标按下执行
    * @param data 事件对象等
@@ -92,6 +92,7 @@ interface SiteInfo {
   left: number;
   width: number;
   height: number;
+  angle: number;
 }
 export interface ConfigTypes extends BaseOptions {
   plugins?: Plugin[] // 插件

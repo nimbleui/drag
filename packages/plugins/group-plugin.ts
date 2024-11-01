@@ -1,26 +1,18 @@
 import type { Plugin } from "../drag/types";
 
-const STYLE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`
-
-const createEl = (canvas: Element) => {
-  let el = canvas.querySelector(".drag-group");
-
-  if (!el) {
-    el = document.createElement('div');
-    el.classList.add("drag-group");
-
-    canvas.appendChild(el);
-  }
-  el.setAttribute("style", STYLE);
-  return el;
+function setSite(el: HTMLElement, data: { left: number;top: number;width: number;height: number; }) {
+  Object.keys(data).forEach((key: string) => {
+    el.style[key] = `${data[key]}px`;
+  })
 }
 
 export function groupPlugin(): Plugin {
   return {
     name: "group-plugin",
-    runTarge: 'canvas',
-    down({ canvasEl }, done) {
-      const groupEl = createEl(canvasEl);
+    runTarge: ['canvas', 'group'],
+    down({ canvasEl, type }, done) {
+      console.log(type)
+      const groupEl = canvasEl.querySelector("[data-drag-type='group']");
       done({ groupEl });
     },
     move({ disX, disY, funValue, startX, startY, canvasSite }, done) {
@@ -32,10 +24,7 @@ export function groupPlugin(): Plugin {
       const height = Math.abs(disY);
       const top = disY < 0 ? y + disY : y;
       const left = disX < 0 ? x + disX : x;
-      groupEl.style.left = `${left}px`;
-      groupEl.style.top = `${top}px`;
-      groupEl.style.width = `${width}px`;
-      groupEl.style.height = `${height}px`;
+      setSite(groupEl, { width, height,  top, left });
       done({ width, height, top, left });
     },
     up({ moveSite, funValue, canvasSite }) {
@@ -63,10 +52,7 @@ export function groupPlugin(): Plugin {
       if (!els.length) {
         groupEl.style.display = 'none';
       } else {
-        groupEl.style.left = `${minX}px`;
-        groupEl.style.top = `${minY}px`;
-        groupEl.style.width = `${maxX - minX}px`;
-        groupEl.style.height = `${maxY - minY}px`;
+        setSite(groupEl, { width: maxX - minX, height: maxY - minY, top: minY, left: minX });
       }
     }
   }
