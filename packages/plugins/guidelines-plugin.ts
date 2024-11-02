@@ -99,13 +99,13 @@ export function guidelinesPlugin(options?: Options): Plugin {
   return {
     name: 'guidelines-plugin',
     runTarge: 'move',
-    down({ canvasEl, moveSite, currentSite }, done) {
+    down({ canvasEl, moveSite, currentSite, currentEl }, done) {
       const { elY, elX } = createLine(canvasEl, options)
-
-      done({ elY, elX, ...getMoveElementSite(moveSite, currentSite!) })
+      const { offsetLeft: l, offsetTop: t } = currentEl as HTMLElement
+      done({ elY, elX, l, t, ...getMoveElementSite(moveSite, currentSite!) })
     },
     move({ disX, disY, funValue, currentEl, canvasSite, currentSite }) {
-      const { elY, elX, lines } = funValue.down;
+      const { elY, elX, lines, l, t } = funValue.down;
       // 获取画布距离左边和上边的距离
       const { left, top } = canvasSite
       Object.assign(markLines, defaultMarkLine);
@@ -135,14 +135,14 @@ export function guidelinesPlugin(options?: Options): Plugin {
       } else {
         elY.style.top = `${markLines.top}px`;
         elY.style.display = "block";
-        el && (el.style.top = `${y + markLines.diffY - top}px`)
+        el && (el.style.top = `${t + disY + markLines.diffY}px`);
       }
       if (markLines.left == null) {
         elX.style.display = "none";
       } else {
         elX.style.left = `${markLines.left}px`;
         elX.style.display = "block";
-        el && (el.style.left = `${x + markLines.diffX -left}px`)
+        el && (el.style.left = `${l + disX + markLines.diffX}px`);
       }
     },
     up({ funValue }) {
