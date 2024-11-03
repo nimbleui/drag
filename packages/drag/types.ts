@@ -94,8 +94,18 @@ interface SiteInfo {
   height: number;
   angle: number;
 }
-export interface ConfigTypes extends BaseOptions {
-  plugins?: Plugin[] // 插件
-  // 改变位置或者大小触发这个方法
-  changeSiteOrSize?:(target: Element | null, data: SiteInfo | null) => void;
+export interface ConfigTypes {
+  /** 插件 */
+  plugins?: Plugin[]
+  /** 限制移出画布 */
+  limitBoundary?: boolean;
+  /** 缩放比例 */
+  scale?: number | (() => number);
+  /**
+   * 改变位置、大小、旋转角度触发这个方法
+   * @param target 当前移动的元素
+   * @param data 大小、位置、角度信息
+   * @returns 
+   */
+  changeSiteOrSize?: (target: Element | null, data: SiteInfo) => void;
 }

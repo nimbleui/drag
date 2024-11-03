@@ -17,7 +17,7 @@ export function rotatePlugin(): Plugin {
       const diffY = centerY - moveY;
       const radians = Math.atan2(diffY, diffX);
       const deg = (radians * 180) / Math.PI - 90;
-      (currentEl as HTMLElement).style.transform = `rotate(${(deg + 360) % 360}deg)`;
+      (currentEl as HTMLElement).style.transform = `rotate(${(Math.round(deg + 360) % 360)}deg)`;
     },
   }
 }

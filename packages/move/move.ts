@@ -64,7 +64,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
     _options?.stop && e.stopPropagation(); // 阻止事件冒泡
     _options?.prevent && e.preventDefault(); // 阻止默认事件
 
-    const { clientX, clientY } = numScale(e);
+    const { clientX, clientY } = numScale(e, _options);
     const { startX, startY } = data
     let disX = clientX - startX;
     let disY = clientY - startY;
@@ -88,7 +88,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
     _options?.stop && e.stopPropagation();
     _options?.prevent && e.preventDefault();
     
-    const { clientX: endX, clientY: endY } = numScale(e);
+    const { clientX: endX, clientY: endY } = numScale(e, _options);
     Object.assign(data, { endX, endY, isMove: false })
     _options?.up?.({ ...data }, e, { ..._value.callbackReturnValue })
     Object.assign(data, defaultData)

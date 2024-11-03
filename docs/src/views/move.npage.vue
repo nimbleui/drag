@@ -24,14 +24,14 @@ const list = reactive([
   {id: 1, title: '测试1', left: 0, top: 0},
   {id: 2, title: '测试2', left: 200, top: 50},
   {id: 3, title: '测试3', left: 400, top: 100},
+  {id: 3, title: '测试3', left: 600, top: 300},
 ])
 
 const warpRef = ref<HTMLElement>()
 const getEl = () => warpRef.value!
 
 drag(getEl, {
-  prevent: true,
-  // boundary: getEl,
+  scale: 0.5,
   changeSiteOrSize(target, data) {
     // console.log(data)
   },
@@ -46,11 +46,13 @@ drag(getEl, {
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .warp {
   height: 100vh;
   width: 100vw;
   position: relative;
+  transform: scale(0.5);
+  transform-origin: left top;
 
   .move {
     position: absolute;

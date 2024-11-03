@@ -93,20 +93,20 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
 const keys = ['disX', 'disY', 'startX', 'startY', 'moveX', 'moveY', 'isMove'] as Array<'disX' | 'disY' |'startX'| 'startY'| 'moveX'| 'moveY'| 'isMove'>
 
 export function drag(el: () => Element, config: ConfigTypes) {
-  const { plugins = [], ...options } = config
+  const { plugins = [], scale, changeSiteOrSize } = config
   const pluginType = handlePlugins(plugins)
   const usePlugins = getCitePlugins(plugins)
 
   return elDrag(el, {
-    ...options,
+    scale,
     down(data, e) {
       const values = objectTransform(data, keys);
       // 缩放比例
-      const scale = isFunctionOrValue(options.scale) || 1;
+      const s = isFunctionOrValue(scale) || 1;
       // // 移动元素的宽高、大小
-      const { moveSite, currentEl, currentSite, type } = getAllMoveSiteInfo(e.target as Element, scale, data.binElement!);
+      const { moveSite, currentEl, currentSite, type } = getAllMoveSiteInfo(e.target as Element, s, data.binElement!);
       // 画布位置信息
-      const canvasSite = getBoundingClientRectByScale(data.binElement!, scale);
+      const canvasSite = getBoundingClientRectByScale(data.binElement!, s);
       // 点击的元素
       const eventTarget = e.target as HTMLElement;
       // 创建点
@@ -117,7 +117,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         ...values,
         e,
         type,
-        scale,
+        scale: s,
         moveSite,
         currentEl,
         currentSite,
@@ -135,7 +135,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       if (down.currentEl) {
         const site = getBoundingClientRectByScale(down.currentEl, down.scale)
         const angle = getRotationDegrees(down.currentEl)
-        options.changeSiteOrSize?.(down.currentEl, {...site, angle});
+        changeSiteOrSize?.(down.currentEl, {...site, angle});
         down.createEl();
       }
     },
