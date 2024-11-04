@@ -31,9 +31,9 @@ const warpRef = ref<HTMLElement>()
 const getEl = () => warpRef.value!
 
 drag(getEl, {
-  scale: 0.5,
+  scale: 1,
   changeSiteOrSize(target, data) {
-    // console.log(data)
+    console.log(data)
   },
   plugins: [
     movePlugin(),
@@ -51,7 +51,7 @@ drag(getEl, {
   height: 100vh;
   width: 100vw;
   position: relative;
-  transform: scale(0.5);
+  transform: scale(1);
   transform-origin: left top;
 
   .move {

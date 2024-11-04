@@ -19,7 +19,7 @@ function handlePlugins(plugins: Plugin[]) {
       if (!checked) return
 
       if (!returnValue[name]) returnValue[name] = {};
-      plugin[type]?.({ ...data, funValue: returnValue[name] }, (val) => {
+      plugin[type]?.({ ...data, type: elType, funValue: returnValue[name] }, (val) => {
         returnValue[name][type] = val;
       });
     })
