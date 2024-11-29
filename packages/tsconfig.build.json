@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "baseUrl": "./",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "module": "NodeNext",
+    "declarationDir": "../dist/types",
+    "moduleResolution": "NodeNext",
+    "paths": {
+      "@nimble-ui/*": ["../packages/*"],
+    }
+  }
+}

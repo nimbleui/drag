@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "docs:dev": "pnpm -r --filter=@nimble-ui/docs run dev"
+    "docs:dev": "pnpm -r --filter=@nimble-ui/docs run dev",
+    "build": "pnpm -r --filter=@nimble-ui/build run build"
   },
   "keywords": [],
   "author": "",
@@ -11,6 +12,8 @@
   "workspaces": [
     "packages/utils",
     "packages/drag",
-    "packages/move"
+    "packages/move",
+    "docs",
+    "build"
   ]
 }

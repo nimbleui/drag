@@ -10,9 +10,9 @@ export interface BaseOptions {
 }
 
 export interface OptionsType extends BaseOptions {
-  down?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => void;
-  move?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => void;
-  up?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => void;
+  down?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => any;
+  move?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => any;
+  up?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => any;
   setTarget?: (e: MouseTouchEvent) => Element
 }
 
