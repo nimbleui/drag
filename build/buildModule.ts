@@ -14,7 +14,7 @@ export const buildModules = async () => {
         target: "es2015"
       }),
       resolvePlugin(),
-      commonjs,
+      commonjs(),
     ],
     treeshake: false
   })
