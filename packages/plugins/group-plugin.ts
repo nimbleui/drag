@@ -12,6 +12,9 @@ function setSite(el: HTMLElement, data: { left: number;top: number;width: number
 const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
   down({ canvasEl }, done) {
     const groupEl = canvasEl.querySelector("[data-drag-type='group']");
+    if (groupEl) {
+      (groupEl as HTMLElement).style.display = 'none';
+    }
     done({ groupEl });
   },
   move({ disX, disY, funValue, startX, startY, canvasSite }, done) {
@@ -59,23 +62,25 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
 }
 
 const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
-  down({ canvasEl }, done) {
+  down({ canvasEl, funValue }, done) {
     const groupEl = canvasEl.querySelector("[data-drag-type='group']");
     const { offsetLeft: l, offsetTop: t } = groupEl as HTMLElement;
-    done({ groupEl, l, t });
+    const { els } = funValue.up;
+
+    const elsSite = els.map((el: HTMLElement) => ({ left: el.offsetLeft, top: el.offsetTop, el }));
+
+    done({ groupEl, l, t, elsSite });
   },
-  move({ funValue, disX, disY, canvasSite }) {
-    const { groupEl, l, t } = funValue.down;
-    const { els } = funValue.up
+  move({ funValue, disX, disY }) {
+    const { groupEl, l, t, elsSite } = funValue.down;
     const y = disY + t;
     const x = disX + l;
     const el = groupEl as HTMLElement
     el.style.top = `${y}px`;
     el.style.left = `${x}px`;
-    els.forEach((el: HTMLElement) => {
-      const { offsetLeft, offsetTop } = el;
-      (el as HTMLElement).style.left = `${offsetLeft + disX - canvasSite.left}px`;
-      (el as HTMLElement).style.top = `${offsetTop + disY - canvasSite.top}px`
+    elsSite.forEach((item: { left: number; top: number; el: HTMLElement }) => {
+      item.el.style.left = `${item.left + disX}px`;
+      item.el.style.top = `${item.top + disY}px`
     })
   },
 }
