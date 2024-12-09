@@ -80,15 +80,15 @@ import drag from "@nimble-ui/drag"
 ```
 
 ## drag 参数
-|  属性名  |    说明    |         类型        | 默认 |
-|---------|------------|---------------------|-----|
-| el      |  画布元素   | Function \| element | - |
-| options |  参数       | Object              | - |
+|  属性名  |    说明    |           类型           | 默认 |
+|---------|------------|--------------------------|-----|
+| el      |  画布元素   | () => element \| element | - |
+| options |  参数       | Object                   | - |
 
 ### options属性
 | 属性名            | 说明                             | 类型                  | 默认 |
 | -----------------| -------------------------------- | --------------------- | ---- |
-| plugins          | 插件                              | Array                 | -   |
-| scale            | 画布缩放比例                      | () => number \| number | -   |
-| limitBoundary    | 限制移出画布(未实现)               | boolean                | -   |
-| changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void | -   |
+| plugins          | 插件                              | Array                 |  -  |
+| scale            | 画布缩放比例                      | () => number \| number |  -  |
+| limitBoundary    | 限制移出画布(未实现)               | boolean                |  -  |
+| changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void |  -  |
