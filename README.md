@@ -1,7 +1,7 @@
-# nimbleui drag 拖拽插件
+# nimble-ui drag 拖拽插件
 
 ## 介绍
-nimbleUi/drag 拖拽插件支持一下功能：
+nimble-ui drag 拖拽插件支持一下功能：
 - 拖拽
 - 缩放
 - 旋转
