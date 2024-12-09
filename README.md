@@ -1,5 +1,4 @@
-# nimbleUi/drag 拖拽插件
-
+# nimbleui drag 拖拽插件
 
 ## 介绍
 nimbleUi/drag 拖拽插件支持一下功能：
@@ -15,8 +14,10 @@ nimbleUi/drag 拖拽插件支持一下功能：
 
 ```sh
 npm i @nimble-ui/drag
-# 或者
+# or
 yarn add @nimble-ui/drag
+# or
+pnpm i @nimble-ui/drag
 ```
 
 ### 在vue中使用
@@ -38,7 +39,7 @@ yarn add @nimble-ui/drag
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import drag { movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin, groupPlugin } from '@nimble-ui/drag';
+import drag, { movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin, groupPlugin } from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
 
@@ -58,11 +59,11 @@ drag(getEl, {
     console.log(data)
   },
   plugins: [
-    movePlugin(),
-    sizePlugin(),
-    guidelinesPlugin(),
-    rotatePlugin(),
-    groupPlugin()
+    movePlugin(), // 拖拽插件
+    sizePlugin(), // 放大缩小插件
+    groupPlugin(), // 组合拖拽插件
+    rotatePlugin(), // 旋转插件
+    guidelinesPlugin(), // 辅助线插件
   ],
 })
 
@@ -70,9 +71,23 @@ drag(getEl, {
 ```
 
 ### 在react中使用
-```ts
+```tsx
 import drag from "@nimble-ui/drag"
 
 
 
 ```
+
+## drag 参数
+|  属性名  |    说明    |         类型        | 默认 |
+|---------|------------|---------------------|-----|
+| el      |  画布元素   | Function \| element | - |
+| options |  参数       | Object              | - |
+
+### options属性
+| 属性名            | 说明                             | 类型                  | 默认 |
+| -----------------| -------------------------------- | --------------------- | ---- |
+| plugins          | 插件                              | Array                 | -   |
+| scale            | 画布缩放比例                      | () => number \| number | -   |
+| limitBoundary    | 限制移出画布(未实现)               | boolean                | -   |
+| changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void | -   |
