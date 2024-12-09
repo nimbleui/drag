@@ -21,7 +21,7 @@ pnpm i @nimble-ui/drag
 ```
 
 ### 在vue中使用
-```vue
+```html
 <!-- 注意：可拖拽的元素一定要添加 data-drag-type="move" 属性，这个属性告诉插件该元素可移动 -->
 <template>
   <div ref="warpRef" class="warp">
