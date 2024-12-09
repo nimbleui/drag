@@ -94,6 +94,30 @@ interface SiteInfo {
   height: number;
   angle: number;
 }
+
+interface ElsOption {
+  /**
+   * @description 当前操作的元素
+   */
+  targe: Element | null;
+  /**
+   * @description 八个点元素
+   */
+  dots: Array<Element>;
+  /**
+   * @description 八个点的父元素
+   */
+  dotWarp: Element;
+  /**
+   * @description 组元素
+   */
+  group: Element | null;
+  /**
+   * @description 旋转元素
+   */
+  rotate: Element | null;
+}
+
 export interface ConfigTypes {
   /** 插件 */
   plugins?: Plugin[]
@@ -108,4 +132,7 @@ export interface ConfigTypes {
    * @returns 
    */
   changeSiteOrSize?: (target: Element | null, data: SiteInfo) => void;
+  downEls?: (els: ElsOption) => void;
+  moveEls?: (els: ElsOption) => void;
+  upEls?: (els: ElsOption) => void;
 }

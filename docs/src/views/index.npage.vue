@@ -4,17 +4,8 @@
   </div>
 </template>
 
-
-<script lang="ts">
-export default {
-  name: "index",
-};
-</script>
 <script setup lang="ts">
-defineProps({})
+defineOptions({ name: "IndexPage" })
 </script>
 
-<style  lang="scss" scoped>
-
- 
-</style>
+<style  lang="scss" scoped></style>

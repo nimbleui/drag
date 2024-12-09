@@ -28,12 +28,12 @@ export async function buildFullBundle() {
       file: resolve(projRoot, `./dist/index.full.min.js`),
       exports: "named",
       name: "yDrag",
-      sourcemap: true,
+      sourcemap: false,
     },
     {
       format: "esm",
       file: resolve(projRoot, `./dist/index.full.min.mjs`),
-      sourcemap: true,
+      sourcemap: false,
     },
   ])
 }

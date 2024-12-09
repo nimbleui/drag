@@ -1,4 +1,26 @@
+# nimbleUi/drag 拖拽插件
 
+
+## 介绍
+nimbleUi/drag 拖拽插件支持一下功能：
+- 拖拽
+- 缩放
+- 旋转
+- 辅助线
+- 组合拖拽
+
+## ⚡ 使用说明
+
+### 安装依赖
+
+```sh
+npm i @nimble-ui/drag
+# 或者
+yarn add @nimble-ui/drag
+```
+
+### 在vue中使用
+```vue
 <template>
   <div ref="warpRef" class="warp">
     <div
@@ -9,14 +31,14 @@
       class="move"
       :style="{left: `${item.left}px`, top: `${item.top}px`, transform: `rotate(${item.angle || 0}deg)`}"
     >
-      <div class="content"></div>
+      <div class="content">{{item.title}}</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { drag, movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin, groupPlugin } from '@nimble-ui/drag';
+import drag { movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin, groupPlugin } from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
 
@@ -45,25 +67,12 @@ drag(getEl, {
 })
 
 </script>
+```
 
-<style lang="scss">
-.warp {
-  height: 100vh;
-  width: 100vw;
-  position: relative;
-  transform: scale(1);
-  transform-origin: left top;
+### 在react中使用
+```ts
+import drag from "@nimble-ui/drag"
 
-  .move {
-    position: absolute;
-    width: 150px;
-    height: 50px;
-    background-color: red;
-  }
 
-  .content {
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>
+
+```
