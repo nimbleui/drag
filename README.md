@@ -56,6 +56,7 @@ const getEl = () => warpRef.value!
 
 drag(getEl, {
   scale: 1,
+  disabled: (target) => target?.getAttribute('data-drag-id') == '3',
   changeSiteOrSize(list) {
     console.log(list)
   },
@@ -87,8 +88,9 @@ import drag from "@nimble-ui/drag"
 
 ### options属性
 | 属性名            | 说明                             | 类型                  | 默认 |
-| -----------------| -------------------------------- | --------------------- | ---- |
+|------------------| -------------------------------- | --------------------- | ---- |
 | plugins          | 插件                              | Array                 |  -  |
 | scale            | 画布缩放比例                      | number \| () => number |  -  |
 | limitBoundary    | 限制移出画布(未实现)               | boolean                |  -  |
 | changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void |  -  |
+| disabled         | 禁止拖拽                          | (target) => boolean    | - |

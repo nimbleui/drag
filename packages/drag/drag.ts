@@ -157,7 +157,7 @@ const keys = [
 >;
 
 export function drag(el: () => Element, config: ConfigTypes) {
-  const { plugins = [], scale, changeSiteOrSize } = config;
+  const { plugins = [], scale, changeSiteOrSize, disabled } = config;
   const pluginType = handlePlugins(plugins);
   const usePlugins = getCitePlugins(plugins);
 
@@ -167,12 +167,14 @@ export function drag(el: () => Element, config: ConfigTypes) {
       const values = objectTransform(data, keys);
       // 缩放比例
       const s = isFunctionOrValue(scale) || 1;
-      // // 移动元素的宽高、大小
+      // 移动元素的宽高、大小
       const { moveSite, currentEl, currentSite, type } = getAllMoveSiteInfo(
         e.target as Element,
         s,
         data.binElement!
       );
+      // 判断是否禁用
+      if (disabled?.(currentEl)) return;
       // 画布位置信息
       const canvasSite = getBoundingClientRectByScale(data.binElement!, s);
       // 点击的元素

@@ -102,29 +102,6 @@ export interface SiteInfo {
   angle: number;
 }
 
-interface ElsOption {
-  /**
-   * @description 当前操作的元素
-   */
-  targe: Element | null;
-  /**
-   * @description 八个点元素
-   */
-  dots: Array<Element>;
-  /**
-   * @description 八个点的父元素
-   */
-  dotWarp: Element;
-  /**
-   * @description 组元素
-   */
-  group: Element | null;
-  /**
-   * @description 旋转元素
-   */
-  rotate: Element | null;
-}
-
 export interface ConfigTypes {
   /** 插件 */
   plugins?: Plugin[];
@@ -139,7 +116,17 @@ export interface ConfigTypes {
    * @returns
    */
   changeSiteOrSize?: (data: SiteInfo[]) => void;
-  downEls?: (els: ElsOption) => void;
-  moveEls?: (els: ElsOption) => void;
-  upEls?: (els: ElsOption) => void;
+  /**  修改元素的颜色 */
+  changeStyle?: () => ({
+    guideline?: { color?: string };
+    dot?: { background?: string; borderColor?: string };
+    group?: { background?: string; borderColor?: string };
+    rotate?: { background?: string; borderColor?: string };
+  });
+  /**
+   * 禁止拖拽
+   * @param target 当前点击的元素 
+   * @returns 
+   */
+  disabled?: (target: Element | null) => boolean
 }

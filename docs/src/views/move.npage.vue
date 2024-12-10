@@ -31,10 +31,10 @@ import {
 defineOptions({ name: 'move' });
 
 const list = reactive([
-  { id: 1, title: '测试1', left: 0, top: 0 },
+  { id: 1, title: '测试1', left: 0, top: 0, angle: 0 },
   { id: 2, title: '测试2', left: 200, top: 50 },
   { id: 3, title: '测试3', left: 500, top: 200 },
-  { id: 3, title: '测试3', left: 600, top: 300 },
+  { id: 4, title: '测试3', left: 600, top: 300 },
 ]);
 
 const warpRef = ref<HTMLElement>();
@@ -44,6 +44,9 @@ drag(getEl, {
   scale: 1,
   changeSiteOrSize(list) {
     console.log(list);
+  },
+  disabled(target) {
+    return target?.getAttribute('data-drag-id') == '3'
   },
   plugins: [
     movePlugin(),
@@ -71,8 +74,11 @@ drag(getEl, {
   }
 
   .content {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    left: 50px;
+    top: 25px;
+    width: 50%;
+    height: 50%;
   }
 }
 </style>
