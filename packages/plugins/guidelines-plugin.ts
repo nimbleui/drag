@@ -1,4 +1,4 @@
-import type { Plugin, MoveRectList, MoveRect } from "../drag/types";
+import type { Plugin, MoveRectList, MoveRect } from '../drag/types';
 interface Options {
   color?: string; // 辅助线的元素
   threshold?: number; // 吸附
@@ -21,47 +21,57 @@ const defaultMarkLine = { top: null, left: null, diffX: 0, diffY: 0 };
 /**
  * 创建辅助线元素
  * @param el 画布
- * @param options 参数 
- * @returns 
+ * @param options 参数
+ * @returns
  */
 function createLine(el: Element, options?: Options) {
-  let elY = el.querySelector(".drag-guideline-line-y") as HTMLElement | null;
-  let elX = el.querySelector(".drag-guideline-line-x") as HTMLElement | null;
-  const color = options?.color || '#1677ff'
+  let elY = el.querySelector('.drag-guideline-line-y') as HTMLElement | null;
+  let elX = el.querySelector('.drag-guideline-line-x') as HTMLElement | null;
+  const color = options?.color || '#1677ff';
   if (!elY) {
-    elY = document.createElement("div");
-    elY.classList.add("drag-guideline-line-y");
+    elY = document.createElement('div');
+    elY.classList.add('drag-guideline-line-y');
     elY.setAttribute(
-      "style",
+      'style',
       `position: absolute; background-color: ${color}; display: none;width: 100%; height: 1px;`
     );
     el.appendChild(elY);
   }
 
   if (!elX) {
-    elX = document.createElement("div");
-    elX.classList.add("drag-guideline-line-x");
+    elX = document.createElement('div');
+    elX.classList.add('drag-guideline-line-x');
     elX.setAttribute(
-      "style",
+      'style',
       `top: 0;position: absolute; background-color: ${color}; display: none;width: 1px; height: 100%;`
     );
     el.appendChild(elX);
   }
 
-  return { elX, elY }
+  return { elX, elY };
 }
 
 /**
  * 计算碰撞值
- * @param moves 
- * @param sourceRect 
- * @returns 
+ * @param moves
+ * @param sourceRect
+ * @returns
  */
-function getMoveElementSite(moves: MoveRectList, sourceRect: Omit<MoveRect, 'el'>) {
-  const { height, width } = sourceRect
-  const lines: { x: LineType, y: LineType } = { x: [], y: [] }
+function getMoveElementSite(
+  moves: MoveRectList,
+  sourceRect: Omit<MoveRect, 'el'>
+) {
+  const { height, width } = sourceRect;
+  const lines: { x: LineType; y: LineType } = { x: [], y: [] };
   for (let i = 0; i < moves.length || 0; i++) {
-    const { left: l, top: t, width: w, height: h, right: r, bottom: b } = moves[i];
+    const {
+      left: l,
+      top: t,
+      width: w,
+      height: h,
+      right: r,
+      bottom: b,
+    } = moves[i];
     const halfW = w / 2;
     const halfH = h / 2;
 
@@ -90,36 +100,36 @@ function getMoveElementSite(moves: MoveRectList, sourceRect: Omit<MoveRect, 'el'
     lines.x.push({ showValue: r, value: r - width }); // 右对右
   }
 
-  return { lines }
+  return { lines };
 }
 
 export function guidelinesPlugin(options?: Options): Plugin {
-  const threshold = options?.threshold ?? 5
-  const markLines: MarkLineType = Object.assign({}, defaultMarkLine)
+  const threshold = options?.threshold ?? 5;
+  const markLines: MarkLineType = Object.assign({}, defaultMarkLine);
   return {
     name: 'guidelines-plugin',
     runTarge: 'move',
     down({ canvasEl, moveSite, currentSite, currentEl }, done) {
-      const { elY, elX } = createLine(canvasEl, options)
-      const { offsetLeft: l, offsetTop: t } = currentEl as HTMLElement
-      done({ elY, elX, l, t, ...getMoveElementSite(moveSite, currentSite!) })
+      const { elY, elX } = createLine(canvasEl, options);
+      const { offsetLeft: l, offsetTop: t } = currentEl as HTMLElement;
+      done({ elY, elX, l, t, ...getMoveElementSite(moveSite, currentSite!) });
     },
     move({ disX, disY, funValue, currentEl, canvasSite, currentSite }) {
       const { elY, elX, lines, l, t } = funValue.down;
       // 获取画布距离左边和上边的距离
-      const { left, top } = canvasSite
+      const { left, top } = canvasSite;
       Object.assign(markLines, defaultMarkLine);
 
-      const y = currentSite!.top + disY
+      const y = currentSite!.top + disY;
       for (let i = 0; i < lines.y.length; i++) {
         const { value, showValue } = lines.y[i];
         if (Math.abs(value - y) < threshold) {
           markLines.diffY = value - y;
-          markLines.top = showValue - top
+          markLines.top = showValue - top;
           break;
         }
       }
-      const x = currentSite!.left + disX
+      const x = currentSite!.left + disX;
       for (let i = 0; i < lines.x.length; i++) {
         const { value, showValue } = lines.x[i];
         if (Math.abs(value - x) < threshold) {
@@ -129,26 +139,26 @@ export function guidelinesPlugin(options?: Options): Plugin {
         }
       }
 
-      const el = currentEl as HTMLElement
+      const el = currentEl as HTMLElement;
       if (markLines.top == null) {
-        elY.style.display = "none";
+        elY.style.display = 'none';
       } else {
         elY.style.top = `${markLines.top}px`;
-        elY.style.display = "block";
+        elY.style.display = 'block';
         el && (el.style.top = `${t + disY + markLines.diffY}px`);
       }
       if (markLines.left == null) {
-        elX.style.display = "none";
+        elX.style.display = 'none';
       } else {
         elX.style.left = `${markLines.left}px`;
-        elX.style.display = "block";
+        elX.style.display = 'block';
         el && (el.style.left = `${l + disX + markLines.diffX}px`);
       }
     },
     up({ funValue }) {
       const { elY, elX } = funValue.down;
-      elX.style.display = "none";
-      elY.style.display = "none";
-    }
-  }
+      elX.style.display = 'none';
+      elY.style.display = 'none';
+    },
+  };
 }

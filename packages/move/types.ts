@@ -1,22 +1,30 @@
-export type ElType = Element | (() => Element)
+export type ElType = Element | (() => Element);
 
 export interface BaseOptions {
-  boundary?: ElType | Window // 拖拽的边界元素
-  prevent?: boolean // 阻止默认事件
-  stop?: boolean // 阻止事件冒泡
-  scale?: number | (() => number | undefined) // 缩放比例
-  expand?: number // 边界元素扩大
-  agencyTarget?: (el: Element) => Element | undefined | false | void // 判断是否要代理
+  boundary?: ElType | Window; // 拖拽的边界元素
+  prevent?: boolean; // 阻止默认事件
+  stop?: boolean; // 阻止事件冒泡
+  scale?: number | (() => number | undefined); // 缩放比例
+  expand?: number; // 边界元素扩大
+  agencyTarget?: (el: Element) => Element | undefined | false | void; // 判断是否要代理
 }
 
 export interface OptionsType extends BaseOptions {
-  down?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => any;
-  move?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => any;
+  down?: (
+    data: DataTypes,
+    e: MouseTouchEvent,
+    value: CallbackReturnValue
+  ) => any;
+  move?: (
+    data: DataTypes,
+    e: MouseTouchEvent,
+    value: CallbackReturnValue
+  ) => any;
   up?: (data: DataTypes, e: MouseTouchEvent, value: CallbackReturnValue) => any;
-  setTarget?: (e: MouseTouchEvent) => Element
+  setTarget?: (e: MouseTouchEvent) => Element;
 }
 
-export type MouseTouchEvent = MouseEvent | TouchEvent
+export type MouseTouchEvent = MouseEvent | TouchEvent;
 
 export interface DataTypes {
   startX: number; // 按下鼠标x轴位置
@@ -28,9 +36,9 @@ export interface DataTypes {
   endX: number; // 鼠标抬起x轴的距离
   endY: number; // 鼠标抬起Y轴的距离
   isMove: boolean; // 是否移动
-  target?: Element // 当前移动的元素
-  binElement?: Element // 绑定的元素
+  target?: Element; // 当前移动的元素
+  binElement?: Element; // 绑定的元素
 }
 
-export type LimitInfoType = { l: number; r: number; t: number; b: number; }
-export type CallbackReturnValue = { down?: any; move?: any; up?: any}
+export type LimitInfoType = { l: number; r: number; t: number; b: number };
+export type CallbackReturnValue = { down?: any; move?: any; up?: any };

@@ -1,13 +1,13 @@
-import type { Plugin } from "../drag/types";
+import type { Plugin } from '../drag/types';
 
 interface Options {}
 
 function infoPlugin(options: Options): Plugin {
   return {
-    name: "info-plugin",
+    name: 'info-plugin',
     runTarge: 'move',
     move(data, done) {
-      console.log(222)
+      console.log(222);
     },
-  }
+  };
 }

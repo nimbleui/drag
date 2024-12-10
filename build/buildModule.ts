@@ -1,9 +1,9 @@
-import { rollup } from "rollup";
-import resolvePlugin from "@rollup/plugin-node-resolve";
-import esbuild from "rollup-plugin-esbuild";
+import { rollup } from 'rollup';
+import resolvePlugin from '@rollup/plugin-node-resolve';
+import esbuild from 'rollup-plugin-esbuild';
 import commonjs from '@rollup/plugin-commonjs';
-import { resolve } from "node:path";
-import { projRoot, writeBundles } from "./utils";
+import { resolve } from 'node:path';
+import { projRoot, writeBundles } from './utils';
 
 export const buildModules = async () => {
   const bundle = await rollup({
@@ -11,29 +11,29 @@ export const buildModules = async () => {
     plugins: [
       esbuild({
         sourceMap: true,
-        target: "es2015"
+        target: 'es2015',
       }),
       resolvePlugin(),
       commonjs(),
     ],
-    treeshake: false
-  })
+    treeshake: false,
+  });
 
   await writeBundles(bundle, [
     {
-      format: "esm",
+      format: 'esm',
       dir: resolve(projRoot, './dist/es'),
       preserveModules: true,
       sourcemap: true,
       entryFileNames: `[name].esm.js`,
     },
     {
-      format: "cjs",
+      format: 'cjs',
       dir: resolve(projRoot, './dist/lib'),
-      exports: "named",
+      exports: 'named',
       preserveModules: true,
       sourcemap: true,
       entryFileNames: `[name].cjs.js`,
     },
   ]);
-}
+};

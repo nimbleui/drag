@@ -1,22 +1,26 @@
-import { isFunction } from "./types";
+import { isFunction } from './types';
 
 let uid = 1;
-export function useId(prefix = "y") {
+export function useId(prefix = 'y') {
   return `${prefix}-${Date.now()}-${uid++}`;
 }
 
-export function isFunctionOrValue<T>(val: T): T extends (...args: any) => any ? ReturnType<T> : T {
+export function isFunctionOrValue<T>(
+  val: T
+): T extends (...args: any) => any ? ReturnType<T> : T {
   return isFunction(val) ? val() : val;
 }
 
-export function getParentTarget(element: Element, polyfill: (el: HTMLElement) => boolean) {
+export function getParentTarget(
+  element: Element,
+  polyfill: (el: HTMLElement) => boolean
+) {
   let parent = element as HTMLElement | null;
   while (parent) {
     if (polyfill(parent)) {
-      return parent
+      return parent;
     }
-    parent = parent.parentElement
+    parent = parent.parentElement;
   }
-  return null
+  return null;
 }
-

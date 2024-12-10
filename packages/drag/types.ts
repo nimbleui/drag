@@ -1,5 +1,11 @@
-import type { OptionsType, BaseOptions, ElType, DataTypes, MouseTouchEvent } from "@nimble-ui/move"
-export { ElType, OptionsType, DataTypes, MouseTouchEvent }
+import type {
+  OptionsType,
+  BaseOptions,
+  ElType,
+  DataTypes,
+  MouseTouchEvent,
+} from '@nimble-ui/move';
+export { ElType, OptionsType, DataTypes, MouseTouchEvent };
 
 export interface MoveRect {
   left: number;
@@ -53,7 +59,7 @@ export interface PluginOptions extends Common {
   /** 事件对象 */
   e: MouseTouchEvent;
   /** 函数的返回值 */
-  funValue: { down?: any; move?: any, up?: any };
+  funValue: { down?: any; move?: any; up?: any };
 }
 
 type PluginReturnValue = (data: any) => void;
@@ -121,7 +127,7 @@ interface ElsOption {
 
 export interface ConfigTypes {
   /** 插件 */
-  plugins?: Plugin[]
+  plugins?: Plugin[];
   /** 限制移出画布 */
   limitBoundary?: boolean;
   /** 缩放比例 */
@@ -130,7 +136,7 @@ export interface ConfigTypes {
    * 改变位置、大小、旋转角度触发这个方法
    * @param target 当前移动的元素
    * @param data 大小、位置、角度信息
-   * @returns 
+   * @returns
    */
   changeSiteOrSize?: (data: SiteInfo[]) => void;
   downEls?: (els: ElsOption) => void;

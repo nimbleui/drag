@@ -1,9 +1,12 @@
-import type { Plugin } from "../drag/types";
+import type { Plugin } from '../drag/types';
 
-function setSite(el: HTMLElement, data: { left: number;top: number;width: number;height: number; }) {
+function setSite(
+  el: HTMLElement,
+  data: { left: number; top: number; width: number; height: number }
+) {
   Object.keys(data).forEach((key: string) => {
     el.style[key] = `${data[key]}px`;
-  })
+  });
 }
 
 /**
@@ -27,7 +30,7 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
     const height = Math.abs(disY);
     const top = disY < 0 ? y + disY : y;
     const left = disX < 0 ? x + disX : x;
-    setSite(groupEl, { width, height,  top, left });
+    setSite(groupEl, { width, height, top, left });
     done({ width, height, top, left });
   },
   up({ moveSite, funValue, canvasSite }, done) {
@@ -41,7 +44,7 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
       maxX = -Infinity,
       minY = Infinity,
       maxY = -Infinity;
-    const els: Element[] = []
+    const els: Element[] = [];
     moveSite.forEach((move) => {
       const { top, left, bottom, right } = move;
       if (t < top && b > bottom && l < left && r > right) {
@@ -51,15 +54,20 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
         minY = Math.min(minY, top - canvasSite.top);
         maxY = Math.max(maxY, bottom - canvasSite.top);
       }
-    })
+    });
     if (!els.length) {
       groupEl.style.display = 'none';
     } else {
-      setSite(groupEl, { width: maxX - minX, height: maxY - minY, top: minY, left: minX });
+      setSite(groupEl, {
+        width: maxX - minX,
+        height: maxY - minY,
+        top: minY,
+        left: minX,
+      });
     }
-    done({ els })
-  }
-}
+    done({ els });
+  },
+};
 
 const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
   down({ canvasEl, funValue }, done) {
@@ -70,7 +78,7 @@ const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
     const elsSite = els.map((el: HTMLElement) => {
       // 设置选择的状态
       el.setAttribute('data-drag-select', 'true');
-      return { left: el.offsetLeft, top: el.offsetTop, el }
+      return { left: el.offsetLeft, top: el.offsetTop, el };
     });
 
     done({ groupEl, l, t, elsSite });
@@ -79,42 +87,41 @@ const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
     const { groupEl, l, t, elsSite } = funValue.down;
     const y = disY + t;
     const x = disX + l;
-    const el = groupEl as HTMLElement
+    const el = groupEl as HTMLElement;
     el.style.top = `${y}px`;
     el.style.left = `${x}px`;
     elsSite.forEach((item: { left: number; top: number; el: HTMLElement }) => {
       item.el.style.left = `${item.left + disX}px`;
-      item.el.style.top = `${item.top + disY}px`
-    })
+      item.el.style.top = `${item.top + disY}px`;
+    });
   },
-}
-
+};
 
 export function groupPlugin(): Plugin {
   return {
-    name: "group-plugin",
+    name: 'group-plugin',
     runTarge: ['canvas', 'group'],
     down(data, done) {
       const { type } = data;
       if (type == 'canvas') {
         makeGroup.down?.(data, done);
       } else if (type == 'group') {
-        cancelGroup.down?.(data, done)
+        cancelGroup.down?.(data, done);
       }
     },
     move(data, done) {
       const { type } = data;
       if (type == 'canvas') {
-        makeGroup.move?.(data, done)
+        makeGroup.move?.(data, done);
       } else if (type == 'group') {
-        cancelGroup.move?.(data, done)
+        cancelGroup.move?.(data, done);
       }
     },
     up(data, done) {
       const { type } = data;
       if (type == 'canvas') {
-        makeGroup.up?.(data, done)
+        makeGroup.up?.(data, done);
       }
-    }
-  }
+    },
+  };
 }

@@ -1,34 +1,34 @@
-import { isFunctionOrValue, isTouchEvent } from "@nimble-ui/utils"
-import { ElType, MouseTouchEvent, OptionsType } from "./types"
+import { isFunctionOrValue, isTouchEvent } from '@nimble-ui/utils';
+import { ElType, MouseTouchEvent, OptionsType } from './types';
 
 /**
  * 获取鼠标的x、y坐标
  * @param e 事件对象
- * @returns 
+ * @returns
  */
 export function getXY(e: MouseTouchEvent) {
-  const result = { x: 0, y: 0 }
+  const result = { x: 0, y: 0 };
   if (isTouchEvent(e)) {
-    const touch = e.targetTouches[0]
-    result.x = touch.pageX
-    result.y = touch.pageY
+    const touch = e.targetTouches[0];
+    result.x = touch.pageX;
+    result.y = touch.pageY;
   } else {
-    result.x = e.clientX
-    result.y = e.clientY
+    result.x = e.clientX;
+    result.y = e.clientY;
   }
 
-  return result
+  return result;
 }
 
 /**
  * 计算缩放比例
  * @param e 事件对象
  * @param options 参数
- * @returns 
+ * @returns
  */
 export const numScale = (e: MouseTouchEvent, options?: OptionsType) => {
   const { x, y } = getXY(e);
-  const scale = isFunctionOrValue(options?.scale) ?? 1
+  const scale = isFunctionOrValue(options?.scale) ?? 1;
 
   return {
     clientX: x / scale,
@@ -40,10 +40,14 @@ export const numScale = (e: MouseTouchEvent, options?: OptionsType) => {
  * 获取代理目标函数
  * @param e 事件对象
  * @param el 元素
- * @param options 参数 
- * @returns 
+ * @param options 参数
+ * @returns
  */
-export const getTarget = (e: MouseTouchEvent, el: ElType, options?: OptionsType) => {
+export const getTarget = (
+  e: MouseTouchEvent,
+  el: ElType,
+  options?: OptionsType
+) => {
   const target = e.target as HTMLElement;
   const agencyTarget = options?.agencyTarget;
   if (!agencyTarget) return isFunctionOrValue(el);
@@ -59,7 +63,7 @@ export const getTarget = (e: MouseTouchEvent, el: ElType, options?: OptionsType)
  */
 export const sunBoundaryValue = (target: Element, options?: OptionsType) => {
   const el = isFunctionOrValue(options?.boundary);
-  if (!el) return null
+  if (!el) return null;
 
   const scale = isFunctionOrValue(options?.scale) ?? 1;
   const expand = options?.expand ?? 0;
@@ -68,8 +72,10 @@ export const sunBoundaryValue = (target: Element, options?: OptionsType) => {
   let boundaryL = 0;
   let boundaryR = document.documentElement.clientWidth;
   let boundaryB = document.documentElement.clientHeight;
-  if (el !== window ) {
-    const { left, top, right, bottom } = (el as Element).getBoundingClientRect();
+  if (el !== window) {
+    const { left, top, right, bottom } = (
+      el as Element
+    ).getBoundingClientRect();
     boundaryT = top - expand;
     boundaryL = left - expand;
     boundaryR = right + expand;
@@ -82,5 +88,5 @@ export const sunBoundaryValue = (target: Element, options?: OptionsType) => {
     r: (boundaryR - rect.right) / scale,
     t: (boundaryT - rect.top) / scale,
     b: (boundaryB - rect.bottom) / scale,
-  }
-}
+  };
+};
