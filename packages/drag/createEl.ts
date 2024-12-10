@@ -60,6 +60,8 @@ export function createElement(options: Options) {
       canvas.appendChild(groupEl);
     }
 
+    console.log(target, groupEl);
+
     // 判断有没有选择可以移动元素
     if (!target) {
       return content.setAttribute('style', 'display: none;');

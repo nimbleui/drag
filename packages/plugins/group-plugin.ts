@@ -67,7 +67,11 @@ const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
     const { offsetLeft: l, offsetTop: t } = groupEl as HTMLElement;
     const { els } = funValue.up;
 
-    const elsSite = els.map((el: HTMLElement) => ({ left: el.offsetLeft, top: el.offsetTop, el }));
+    const elsSite = els.map((el: HTMLElement) => {
+      // 设置选择的状态
+      el.setAttribute('data-drag-select', 'true');
+      return { left: el.offsetLeft, top: el.offsetTop, el }
+    });
 
     done({ groupEl, l, t, elsSite });
   },

@@ -87,7 +87,8 @@ export interface Plugin {
   up?: (data: PluginOptions, done: PluginReturnValue) => void;
 }
 
-interface SiteInfo {
+export interface SiteInfo {
+  el: Element;
   top: number;
   left: number;
   width: number;
@@ -131,7 +132,7 @@ export interface ConfigTypes {
    * @param data 大小、位置、角度信息
    * @returns 
    */
-  changeSiteOrSize?: (target: Element | null, data: SiteInfo) => void;
+  changeSiteOrSize?: (data: SiteInfo[]) => void;
   downEls?: (els: ElsOption) => void;
   moveEls?: (els: ElsOption) => void;
   upEls?: (els: ElsOption) => void;

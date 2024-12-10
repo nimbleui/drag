@@ -1,5 +1,5 @@
 import { elDrag } from "@nimble-ui/move"
-import type { ConfigTypes, RunTarge, MoveRect, MoveRectList, Plugin, PluginOptions, ReturnData } from "./types"
+import type { ConfigTypes, RunTarge, MoveRect, MoveRectList, Plugin, PluginOptions, ReturnData, SiteInfo } from "./types"
 import { getBoundingClientRectByScale, getParentTarget, getRotationDegrees, isFunctionOrValue, objectTransform } from "@nimble-ui/utils"
 import { createElement } from "./createEl"
 
@@ -76,6 +76,8 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
 
   for (let i = 0; i < moves.length; i++) {
     const el = moves[i];
+    // 移除组合拖拽选中的状态
+    el.removeAttribute("data-drag-select");
     const { width, height, left, top, bottom, right } = getBoundingClientRectByScale(el, scale);
     if (el == currentEl) {
       currentEl.setAttribute("data-drag-active", 'true');
@@ -88,6 +90,34 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
   }
 
   return { currentEl, moveSite, currentSite, type: type as RunTarge };
+}
+
+/**
+ * 获取当前变化的组件
+ * @param currentEl 目标元素
+ * @param scale 缩放比例
+ * @returns 
+ */
+function getMoveSite(currentEl: Element | null, scale: number) {
+  const els = document.querySelectorAll("[data-drag-select='true']")
+  const listSite: SiteInfo[] = []
+  if (currentEl) {
+    listSite.push({
+      el: currentEl,
+      angle: getRotationDegrees(currentEl),
+      ...getBoundingClientRectByScale(currentEl, scale),
+    })
+  }
+
+  els.forEach((el) => {
+    listSite.push({
+      el,
+      angle: getRotationDegrees(el),
+      ...getBoundingClientRectByScale(el, scale),
+    })
+  })
+
+  return listSite;
 }
 
 const keys = ['disX', 'disY', 'startX', 'startY', 'moveX', 'moveY', 'isMove'] as Array<'disX' | 'disY' |'startX'| 'startY'| 'moveX'| 'moveY'| 'isMove'>
@@ -128,21 +158,18 @@ export function drag(el: () => Element, config: ConfigTypes) {
       return { createEl, currentEl, scale, moveSite, currentSite, canvasSite, eventTarget, type }
     },
     move(data, e, value) {
-      const down = value.down as ReturnData
-      const values = objectTransform(data, keys)
+      const down = value.down as ReturnData;
+      const values = objectTransform(data, keys);
       pluginType('move', { canvasEl: data.binElement!,  e, ...values, ...down })
 
-      if (down.currentEl) {
-        const site = getBoundingClientRectByScale(down.currentEl, down.scale)
-        const angle = getRotationDegrees(down.currentEl)
-        changeSiteOrSize?.(down.currentEl, {...site, angle});
-        down.createEl();
-      }
+      const listSite = getMoveSite(down.currentEl, down.scale);
+      if (down.currentEl) down.createEl();
+      if (listSite.length) changeSiteOrSize?.(listSite);
     },
     up(data, e, value) {
-      const down = value.down as ReturnData
-      const values = objectTransform(data, keys)
-      pluginType('up', { canvasEl: data.binElement!,  e, ...values, ...down })
+      const down = value.down as ReturnData;
+      const values = objectTransform(data, keys);
+      pluginType('up', { canvasEl: data.binElement!, e, ...values, ...down });
     },
   })
 }

@@ -1,6 +1,6 @@
 # nimble-ui drag 拖拽插件
 
-## 介绍
+## 📢 介绍
 nimble-ui drag 拖拽插件支持以下功能：
 - 拖拽
 - 缩放
@@ -56,8 +56,8 @@ const getEl = () => warpRef.value!
 
 drag(getEl, {
   scale: 1,
-  changeSiteOrSize(target, data) {
-    console.log(data)
+  changeSiteOrSize(list) {
+    console.log(list)
   },
   plugins: [
     movePlugin(), // 拖拽插件
