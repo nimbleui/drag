@@ -1,3 +1,4 @@
+import { DRAG_TYPE, DRAG_SELECT } from "@nimble-ui/constant";
 import type { Plugin } from '../drag/types';
 
 function setSite(
@@ -14,7 +15,7 @@ function setSite(
  */
 const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
   down({ canvasEl }, done) {
-    const groupEl = canvasEl.querySelector("[data-drag-type='group']");
+    const groupEl = canvasEl.querySelector(`[${DRAG_TYPE}='group']`);
     if (groupEl) {
       (groupEl as HTMLElement).style.display = 'none';
     }
@@ -71,13 +72,13 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
 
 const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
   down({ canvasEl, funValue }, done) {
-    const groupEl = canvasEl.querySelector("[data-drag-type='group']");
+    const groupEl = canvasEl.querySelector(`[${DRAG_TYPE}='group']`);
     const { offsetLeft: l, offsetTop: t } = groupEl as HTMLElement;
     const { els } = funValue.up;
 
     const elsSite = els.map((el: HTMLElement) => {
       // 设置选择的状态
-      el.setAttribute('data-drag-select', 'true');
+      el.setAttribute(DRAG_SELECT, 'true');
       return { left: el.offsetLeft, top: el.offsetTop, el };
     });
 

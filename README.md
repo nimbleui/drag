@@ -22,7 +22,11 @@ pnpm i @nimble-ui/drag
 
 ### 在vue中使用
 ```html
-<!-- 注意：可拖拽的元素一定要添加 data-drag-type="move" 属性，这个属性告诉插件该元素可移动 -->
+<!-- 
+ 注意：
+  1.可拖拽的元素一定要添加 data-drag-type="move" 属性，这个属性告诉插件该元素可移动
+  2.data-drag-id 是唯一标识
+-->
 <template>
   <div ref="warpRef" class="warp">
     <div
@@ -56,7 +60,7 @@ const getEl = () => warpRef.value!
 
 drag(getEl, {
   scale: 1,
-  disabled: (target) => target?.getAttribute('data-drag-id') == '3',
+  disabled: (target, id) => id == '3',
   changeSiteOrSize(list) {
     console.log(list)
   },
@@ -93,4 +97,4 @@ import drag from "@nimble-ui/drag"
 | scale            | 画布缩放比例                      | number \| () => number |  -  |
 | limitBoundary    | 限制移出画布(未实现)               | boolean                |  -  |
 | changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void |  -  |
-| disabled         | 禁止拖拽                          | (target) => boolean    | - |
+| disabled         | 禁止拖拽                          | (target, id) => boolean | - |

@@ -102,6 +102,11 @@ export interface SiteInfo {
   angle: number;
 }
 
+export interface ChangeParams {
+  list: SiteInfo[];
+  obj: { [key: string]: SiteInfo };
+}
+
 export interface ConfigTypes {
   /** 插件 */
   plugins?: Plugin[];
@@ -113,9 +118,9 @@ export interface ConfigTypes {
    * 改变位置、大小、旋转角度触发这个方法
    * @param target 当前移动的元素
    * @param data 大小、位置、角度信息
-   * @returns
+   * @returns {void}
    */
-  changeSiteOrSize?: (data: SiteInfo[]) => void;
+  changeSiteOrSize?: (data: ChangeParams) => void;
   /**  修改元素的颜色 */
   changeStyle?: () => ({
     guideline?: { color?: string };
@@ -126,7 +131,8 @@ export interface ConfigTypes {
   /**
    * 禁止拖拽
    * @param target 当前点击的元素 
-   * @returns 
+   * @param id 获取元素属性 data-drag-id 值
+   * @returns {boolean}
    */
-  disabled?: (target: Element | null) => boolean
+  disabled?: (target: Element | null, id?: string | null) => boolean
 }

@@ -1,16 +1,13 @@
 {
-  "name": "@nimble-ui/plugin",
+  "name": "@nimble-ui/constant",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@nimble-ui/constant": "workspace:^",
-    "@nimble-ui/utils": "workspace:^"
-  }
+  "license": "ISC"
 }

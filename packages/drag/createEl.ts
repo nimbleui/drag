@@ -1,4 +1,5 @@
 import { getRotationDegrees } from '@nimble-ui/utils';
+import { DRAG_SITE, DRAG_TYPE } from "@nimble-ui/constant";
 
 const BORDER_STYLE = `position: absolute;box-sizing: border-box;pointer-events: none;z-index: 99999;`;
 const BORER_SITE_STYLE_COMMON = `position: absolute;width: 10px;height: 10px;border-radius: 50%;box-sizing: border-box;z-index: 4;pointer-events: all;`;
@@ -36,8 +37,8 @@ export function createElement(options: Options) {
       if (dot) {
         Object.keys(dotSite).forEach((site) => {
           const el = document.createElement('span');
-          el.setAttribute('data-drag-site', site);
-          el.setAttribute('data-drag-type', 'dot');
+          el.setAttribute(DRAG_SITE, site);
+          el.setAttribute(DRAG_TYPE, 'dot');
           el.setAttribute(
             'style',
             `${BORER_SITE_STYLE_COMMON}${dotSite[site]}border: 1px solid #1677ff;background: #1677ff;`
@@ -48,17 +49,17 @@ export function createElement(options: Options) {
       // 创建可以旋转按钮
       if (rotate) {
         const el = document.createElement('div');
-        el.setAttribute('data-drag-type', 'rotate');
+        el.setAttribute(DRAG_TYPE, 'rotate');
         el.setAttribute('style', `${ROTATE_STYLE}background: #1677ff;`);
         content.appendChild(el);
       }
     }
 
     // 创建组元素
-    let groupEl = canvas.querySelector("[data-drag-type='group']");
+    let groupEl = canvas.querySelector(`[${DRAG_TYPE}='group']`);
     if (group && !groupEl) {
       groupEl = document.createElement('div');
-      groupEl.setAttribute('data-drag-type', 'group');
+      groupEl.setAttribute(DRAG_TYPE, 'group');
       groupEl.setAttribute('style', GROUP_STYE);
       canvas.appendChild(groupEl);
     }

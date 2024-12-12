@@ -16,6 +16,7 @@ import {
   isFunctionOrValue,
   objectTransform,
 } from '@nimble-ui/utils';
+import { DRAG_TYPE, DRAG_ACTIVE, DRAG_DISABLED, DRAG_ID, DRAG_SELECT } from "@nimble-ui/constant";
 import { createElement } from './createEl';
 
 /**
@@ -81,16 +82,16 @@ function getMoveDOM(target?: Element) {
  * @param canvas 画布元素
  */
 function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
-  const moves = canvas?.querySelectorAll('[data-drag-type="move"]');
+  const moves = canvas?.querySelectorAll(`[${DRAG_TYPE}="move"]`);
   // 判断是否点击可操作的元素中
-  let type = target.getAttribute('data-drag-type');
+  let type = target.getAttribute(DRAG_TYPE);
   let currentEl: Element | null = null;
 
   if (!type || type == 'move') {
     currentEl = getMoveDOM(target);
-    currentEl && (type = currentEl?.getAttribute('data-drag-type'));
+    currentEl && (type = currentEl?.getAttribute(DRAG_TYPE));
   } else {
-    currentEl = canvas.querySelector('[data-drag-active="true"]');
+    currentEl = canvas.querySelector(`[${DRAG_ACTIVE}="true"]`);
   }
 
   let currentSite: Omit<MoveRect, 'el'> | null = null;
@@ -100,15 +101,15 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
   for (let i = 0; i < moves.length; i++) {
     const el = moves[i];
     // 移除组合拖拽选中的状态
-    el.removeAttribute('data-drag-select');
+    el.removeAttribute(DRAG_SELECT);
     const { width, height, left, top, bottom, right } =
       getBoundingClientRectByScale(el, scale);
     if (el == currentEl) {
-      currentEl.setAttribute('data-drag-active', 'true');
+      currentEl.setAttribute(DRAG_ACTIVE, 'true');
       currentSite = { width, height, left, top, bottom, right };
     } else {
       // 如果当前元素不是操作元素就移出选择的状态
-      !type && el.removeAttribute('data-drag-active');
+      el.removeAttribute(DRAG_ACTIVE);
       moveSite.push({ width, height, left, top, el, bottom, right });
     }
   }
@@ -123,25 +124,34 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
  * @returns
  */
 function getMoveSite(currentEl: Element | null, scale: number) {
-  const els = document.querySelectorAll("[data-drag-select='true']");
-  const listSite: SiteInfo[] = [];
-  if (currentEl) {
-    listSite.push({
-      el: currentEl,
-      angle: getRotationDegrees(currentEl),
-      ...getBoundingClientRectByScale(currentEl, scale),
-    });
-  }
+  const els = document.querySelectorAll(`[${DRAG_SELECT}='true']`);
+  const listEls = [currentEl, ...els];
+  const result: { list: SiteInfo[], obj: { [key: string]: SiteInfo } } = { list: [], obj: {} };
 
-  els.forEach((el) => {
-    listSite.push({
+  listEls.forEach((el) => {
+    if (!el) return
+    const item = {
       el,
       angle: getRotationDegrees(el),
       ...getBoundingClientRectByScale(el, scale),
-    });
+    }
+    const id = el.getAttribute(DRAG_ID);
+    if (id) result.obj[id] = item;
+    result.list.push(item);
   });
 
-  return listSite;
+  return result;
+}
+
+function handleDisabled(target: Element | null, config: ConfigTypes) {
+  const result = config.disabled?.(target, target?.getAttribute(DRAG_ID));
+
+  if (result) {
+    target?.setAttribute(DRAG_DISABLED, 'true')
+  } else {
+    target?.removeAttribute(DRAG_DISABLED)
+  }
+  return result
 }
 
 const keys = [
@@ -157,12 +167,14 @@ const keys = [
 >;
 
 export function drag(el: () => Element, config: ConfigTypes) {
-  const { plugins = [], scale, changeSiteOrSize, disabled } = config;
+  const { plugins = [], scale, changeSiteOrSize } = config;
   const pluginType = handlePlugins(plugins);
   const usePlugins = getCitePlugins(plugins);
 
   return elDrag(el, {
     scale,
+    stop: true,
+    prevent: true,
     down(data, e) {
       const values = objectTransform(data, keys);
       // 缩放比例
@@ -174,7 +186,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         data.binElement!
       );
       // 判断是否禁用
-      if (disabled?.(currentEl)) return;
+      if (handleDisabled(currentEl, config)) return;
       // 画布位置信息
       const canvasSite = getBoundingClientRectByScale(data.binElement!, s);
       // 点击的元素
@@ -215,9 +227,9 @@ export function drag(el: () => Element, config: ConfigTypes) {
       const values = objectTransform(data, keys);
       pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down });
 
-      const listSite = getMoveSite(down.currentEl, down.scale);
       if (down.currentEl) down.createEl();
-      if (listSite.length) changeSiteOrSize?.(listSite);
+      const { list, obj } = getMoveSite(down.currentEl, down.scale);
+      if (list.length) changeSiteOrSize?.({ list, obj });
     },
     up(data, e, value) {
       const down = value.down as ReturnData;

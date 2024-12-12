@@ -42,11 +42,9 @@ const getEl = () => warpRef.value!;
 
 drag(getEl, {
   scale: 1,
+  disabled: (target, id) => id == '3',
   changeSiteOrSize(list) {
     console.log(list);
-  },
-  disabled(target) {
-    return target?.getAttribute('data-drag-id') == '3'
   },
   plugins: [
     movePlugin(),
