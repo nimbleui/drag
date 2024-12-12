@@ -61,8 +61,9 @@ const getEl = () => warpRef.value!
 drag(getEl, {
   scale: 1,
   disabled: (target, id) => id == '3',
-  changeSiteOrSize(list) {
-    console.log(list)
+  changeSiteOrSize({list, obj}) {
+    console.log(list) // 返回数组
+    console.log(obj) // 如果元素有data-drag-id属性才有值 
   },
   plugins: [
     movePlugin(), // 拖拽插件

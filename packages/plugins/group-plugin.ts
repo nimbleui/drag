@@ -48,14 +48,21 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
     const els: Element[] = [];
     moveSite.forEach((move) => {
       const { top, left, bottom, right } = move;
+
+      const tReal = top - canvasSite.top;
+      const bReal = bottom - canvasSite.top;
+      const lReal = left - canvasSite.left;
+      const rReal = right - canvasSite.left;
+
       // 判断是否禁用
       const isDisabled = move.el.getAttribute(DRAG_DISABLED) == 'true'
-      if (t < top && b > bottom && l < left && r > right && !isDisabled) {
+      // 判断是否在区域内并且不是禁用的
+      if (t < tReal && b > bReal && l < lReal && r > rReal && !isDisabled) {
         els.push(move.el);
-        minX = Math.min(minX, left - canvasSite.left);
-        maxX = Math.max(maxX, right - canvasSite.left);
-        minY = Math.min(minY, top - canvasSite.top);
-        maxY = Math.max(maxY, bottom - canvasSite.top);
+        minX = Math.min(minX, lReal);
+        maxX = Math.max(maxX, rReal);
+        minY = Math.min(minY, tReal);
+        maxY = Math.max(maxY, bReal);
       }
     });
     if (!els.length) {
