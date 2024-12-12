@@ -81,12 +81,13 @@ function getMoveDOM(target?: Element) {
  * @param target 当前拖拽的元素
  * @param canvas 画布元素
  */
-function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
+function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, config: ConfigTypes) {
   const moves = canvas?.querySelectorAll(`[${DRAG_TYPE}="move"]`);
   // 判断是否点击可操作的元素中
   let type = target.getAttribute(DRAG_TYPE);
   let currentEl: Element | null = null;
 
+  // 获取当前操作的元素
   if (!type || type == 'move') {
     currentEl = getMoveDOM(target);
     currentEl && (type = currentEl?.getAttribute(DRAG_TYPE));
@@ -102,6 +103,7 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
     const el = moves[i];
     // 移除组合拖拽选中的状态
     el.removeAttribute(DRAG_SELECT);
+    // 获取元素位置信息
     const { width, height, left, top, bottom, right } =
       getBoundingClientRectByScale(el, scale);
     if (el == currentEl) {
@@ -112,6 +114,10 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element) {
       el.removeAttribute(DRAG_ACTIVE);
       moveSite.push({ width, height, left, top, el, bottom, right });
     }
+
+    // 禁止元素拖拽
+    const isDisabled = config.disabled?.(el, el?.getAttribute(DRAG_ID));
+    isDisabled ? el.setAttribute(DRAG_DISABLED, 'true') : el.removeAttribute(DRAG_DISABLED);
   }
 
   return { currentEl, moveSite, currentSite, type: type as RunTarge };
@@ -143,17 +149,6 @@ function getMoveSite(currentEl: Element | null, scale: number) {
   return result;
 }
 
-function handleDisabled(target: Element | null, config: ConfigTypes) {
-  const result = config.disabled?.(target, target?.getAttribute(DRAG_ID));
-
-  if (result) {
-    target?.setAttribute(DRAG_DISABLED, 'true')
-  } else {
-    target?.removeAttribute(DRAG_DISABLED)
-  }
-  return result
-}
-
 const keys = [
   'disX',
   'disY',
@@ -183,10 +178,11 @@ export function drag(el: () => Element, config: ConfigTypes) {
       const { moveSite, currentEl, currentSite, type } = getAllMoveSiteInfo(
         e.target as Element,
         s,
-        data.binElement!
+        data.binElement!,
+        config
       );
       // 判断是否禁用
-      if (handleDisabled(currentEl, config)) return;
+      if (currentEl?.getAttribute(DRAG_DISABLED) == 'true') return;
       // 画布位置信息
       const canvasSite = getBoundingClientRectByScale(data.binElement!, s);
       // 点击的元素

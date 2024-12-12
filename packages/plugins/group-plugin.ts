@@ -1,4 +1,4 @@
-import { DRAG_TYPE, DRAG_SELECT } from "@nimble-ui/constant";
+import { DRAG_TYPE, DRAG_SELECT, DRAG_DISABLED } from "@nimble-ui/constant";
 import type { Plugin } from '../drag/types';
 
 function setSite(
@@ -48,7 +48,9 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
     const els: Element[] = [];
     moveSite.forEach((move) => {
       const { top, left, bottom, right } = move;
-      if (t < top && b > bottom && l < left && r > right) {
+      // 判断是否禁用
+      const isDisabled = move.el.getAttribute(DRAG_DISABLED) == 'true'
+      if (t < top && b > bottom && l < left && r > right && !isDisabled) {
         els.push(move.el);
         minX = Math.min(minX, left - canvasSite.left);
         maxX = Math.max(maxX, right - canvasSite.left);
