@@ -65,7 +65,7 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
         maxY = Math.max(maxY, bReal);
       }
     });
-    if (!els.length) {
+    if (els.length < 2) {
       groupEl.style.display = 'none';
     } else {
       setSite(groupEl, {
@@ -82,7 +82,7 @@ const makeGroup: Omit<Plugin, 'name' | 'runTarge'> = {
 const cancelGroup: Omit<Plugin, 'name' | 'runTarge'> = {
   down({ canvasEl, funValue }, done) {
     const groupEl = canvasEl.querySelector(`[${DRAG_TYPE}='group']`);
-    const { offsetLeft: l, offsetTop: t } = groupEl as HTMLElement;
+    const { offsetLeft: l, offsetTop: t, offsetWidth: w, offsetHeight: h } = groupEl as HTMLElement;
     const { els } = funValue.up;
 
     const elsSite = els.map((el: HTMLElement) => {

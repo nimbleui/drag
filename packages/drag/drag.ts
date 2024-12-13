@@ -82,7 +82,10 @@ function getMoveDOM(target?: Element) {
  * @param canvas 画布元素
  */
 function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, config: ConfigTypes) {
-  const moves = canvas?.querySelectorAll(`[${DRAG_TYPE}="move"]`);
+  // 获取所有可以移动的元素
+  const moves = canvas.querySelectorAll(`[${DRAG_TYPE}="move"]`);
+  // 获取组元素
+  const groupEl = canvas.querySelector(`[${DRAG_TYPE}="group"]`);
   // 判断是否点击可操作的元素中
   let type = target.getAttribute(DRAG_TYPE);
   let currentEl: Element | null = null;
@@ -91,6 +94,8 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
   if (!type || type == 'move') {
     currentEl = getMoveDOM(target);
     currentEl && (type = currentEl?.getAttribute(DRAG_TYPE));
+  } else if (type == 'group') {
+    currentEl = canvas.querySelector(`[${DRAG_TYPE}="group"]`);
   } else {
     currentEl = canvas.querySelector(`[${DRAG_ACTIVE}="true"]`);
   }
@@ -107,19 +112,22 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
     const { width, height, left, top, bottom, right } =
       getBoundingClientRectByScale(el, scale);
     if (el == currentEl) {
-      currentEl.setAttribute(DRAG_ACTIVE, 'true');
       currentSite = { width, height, left, top, bottom, right };
     } else {
-      // 如果当前元素不是操作元素就移出选择的状态
-      el.removeAttribute(DRAG_ACTIVE);
       moveSite.push({ width, height, left, top, el, bottom, right });
     }
 
+    // 移除选择的状态
+    el.removeAttribute(DRAG_ACTIVE);
     // 禁止元素拖拽
     const isDisabled = config.disabled?.(el, el?.getAttribute(DRAG_ID));
     isDisabled ? el.setAttribute(DRAG_DISABLED, 'true') : el.removeAttribute(DRAG_DISABLED);
   }
 
+  // 移除选择的状态
+  groupEl?.removeAttribute(DRAG_ACTIVE);
+  // 设置选择状态
+  currentEl?.setAttribute(DRAG_ACTIVE, 'true');
   return { currentEl, moveSite, currentSite, type: type as RunTarge };
 }
 
@@ -129,7 +137,8 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
  * @param scale 缩放比例
  * @returns
  */
-function getMoveSite(currentEl: Element | null, scale: number) {
+function getMoveSite(scale: number) {
+  const currentEl = document.querySelector(`[${DRAG_ACTIVE}='true']`);
   const els = document.querySelectorAll(`[${DRAG_SELECT}='true']`);
   const listEls = [currentEl, ...els];
   const result: { list: SiteInfo[], obj: { [key: string]: SiteInfo } } = { list: [], obj: {} };
@@ -224,7 +233,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down });
 
       if (down.currentEl) down.createEl();
-      const { list, obj } = getMoveSite(down.currentEl, down.scale);
+      const { list, obj } = getMoveSite(down.scale);
       if (list.length) changeSiteOrSize?.({ list, obj });
     },
     up(data, e, value) {

@@ -63,6 +63,10 @@ export function createElement(options: Options) {
       groupEl.setAttribute('style', GROUP_STYE);
       canvas.appendChild(groupEl);
     }
+    // 判断当前元素是否组元素
+    if (groupEl != target) {
+      (groupEl as HTMLElement).style.display = 'none';
+    }
 
     // 判断有没有选择可以移动元素
     if (!target) {
