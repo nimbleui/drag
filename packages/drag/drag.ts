@@ -11,12 +11,13 @@ import type {
 } from './types';
 import {
   getBoundingClientRectByScale,
+  getDOMSite,
   getParentTarget,
   getRotationDegrees,
   isFunctionOrValue,
   objectTransform,
 } from '@nimble-ui/utils';
-import { DRAG_TYPE, DRAG_ACTIVE, DRAG_DISABLED, DRAG_ID, DRAG_SELECT } from "@nimble-ui/constant";
+import { DRAG_TYPE, DRAG_ACTIVE, DRAG_DISABLED, DRAG_ID, DRAG_GROUP, DRAG_GROUP_ID } from "@nimble-ui/constant";
 import { createElement } from './createEl';
 
 /**
@@ -31,7 +32,7 @@ function handlePlugins(plugins: Plugin[]) {
     type: 'down' | 'move' | 'up',
     data: Omit<PluginOptions, 'funValue' | 'target'>
   ) => {
-    const elType = data.type || 'canvas';
+    const elType = data.type || 'area';
     plugins.forEach((plugin) => {
       const { runTarge, name } = plugin;
       const checked = Array.isArray(runTarge)
@@ -84,8 +85,7 @@ function getMoveDOM(target?: Element) {
 function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, config: ConfigTypes) {
   // 获取所有可以移动的元素
   const moves = canvas.querySelectorAll(`[${DRAG_TYPE}="move"]`);
-  // 获取组元素
-  const groupEl = canvas.querySelector(`[${DRAG_TYPE}="group"]`);
+
   // 判断是否点击可操作的元素中
   let type = target.getAttribute(DRAG_TYPE);
   let currentEl: Element | null = null;
@@ -94,8 +94,6 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
   if (!type || type == 'move') {
     currentEl = getMoveDOM(target);
     currentEl && (type = currentEl?.getAttribute(DRAG_TYPE));
-  } else if (type == 'group') {
-    currentEl = canvas.querySelector(`[${DRAG_TYPE}="group"]`);
   } else {
     currentEl = canvas.querySelector(`[${DRAG_ACTIVE}="true"]`);
   }
@@ -106,8 +104,6 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
 
   for (let i = 0; i < moves.length; i++) {
     const el = moves[i];
-    // 移除组合拖拽选中的状态
-    el.removeAttribute(DRAG_SELECT);
     // 获取元素位置信息
     const { width, height, left, top, bottom, right } =
       getBoundingClientRectByScale(el, scale);
@@ -124,8 +120,6 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
     isDisabled ? el.setAttribute(DRAG_DISABLED, 'true') : el.removeAttribute(DRAG_DISABLED);
   }
 
-  // 移除选择的状态
-  groupEl?.removeAttribute(DRAG_ACTIVE);
   // 设置选择状态
   currentEl?.setAttribute(DRAG_ACTIVE, 'true');
   return { currentEl, moveSite, currentSite, type: type as RunTarge };
@@ -137,23 +131,28 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
  * @param scale 缩放比例
  * @returns
  */
-function getMoveSite(scale: number) {
+function getMoveSite() {
   const currentEl = document.querySelector(`[${DRAG_ACTIVE}='true']`);
-  const els = document.querySelectorAll(`[${DRAG_SELECT}='true']`);
-  const listEls = [currentEl, ...els];
   const result: { list: SiteInfo[], obj: { [key: string]: SiteInfo } } = { list: [], obj: {} };
+  if (!currentEl) return result;
 
-  listEls.forEach((el) => {
-    if (!el) return
-    const item = {
-      el,
-      angle: getRotationDegrees(el),
-      ...getBoundingClientRectByScale(el, scale),
-    }
+  const site = getDOMSite(currentEl);
+  const isGroup = currentEl?.getAttribute(DRAG_GROUP);
+  // 判断当前是否组元素
+  if (!isGroup) {
+    result.list.push({ ...site, el: currentEl });
+    const id = currentEl.getAttribute(DRAG_ID);
+    if (id) result.obj[id] = { ...site, el: currentEl };
+    return result;
+  }
+
+  const els = currentEl.querySelectorAll(`[${DRAG_GROUP_ID}]`);
+  els.forEach((el) => {
+    const { width, left, top, height, angle } = getDOMSite(el);
     const id = el.getAttribute(DRAG_ID);
-    if (id) result.obj[id] = item;
-    result.list.push(item);
-  });
+    const values = { left: left + site.left, angle: angle + site.angle, top: top + site.top, width, height };
+    
+  })
 
   return result;
 }
@@ -233,7 +232,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down });
 
       if (down.currentEl) down.createEl();
-      const { list, obj } = getMoveSite(down.scale);
+      const { list, obj } = getMoveSite();
       if (list.length) changeSiteOrSize?.({ list, obj });
     },
     up(data, e, value) {

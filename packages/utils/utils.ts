@@ -24,3 +24,7 @@ export function getParentTarget(
   }
   return null;
 }
+
+export function createId() {
+  return Math.random().toString(36).substring(2);
+}

@@ -1,3 +1,4 @@
+import { DRAG_GROUP } from '@nimble-ui/constant';
 import type { Plugin } from '../drag/types';
 import { getRotationDegrees } from '@nimble-ui/utils';
 
@@ -23,14 +24,17 @@ export function sizePlugin(options?: Options): Plugin {
 
       done({ l, t, w, h, direction });
     },
-    move({ disX, disY, funValue, currentEl }) {
+    move({ disX, disY, funValue, currentEl, currentSite }) {
       const { l, t, w, h, direction } = funValue.down;
-      const angle = getRotationDegrees(currentEl);
-      const result = handleRatio(disX, disY, direction, angle, {
+
+      const isGroup = currentEl?.getAttribute(`${DRAG_GROUP}`);
+      const result = handleRatio(disX, disY, direction, {
         centerX: l + w / 2,
         centerY: t + h / 2,
         width: w,
         height: h,
+        rotate: getRotationDegrees(currentEl),
+        angle: isGroup == 'angle' ? currentSite!.width / currentSite!.height : undefined,
       });
       const el = currentEl as HTMLElement;
       el.style.left = `${result.left}px`;
@@ -52,27 +56,30 @@ const setValue = (size: number, delta: number, minSize = 0) => {
   return [size, delta];
 };
 
-type Rect = { centerX: number; centerY: number; width: number; height: number };
+type Rect = { centerX: number; centerY: number; width: number; height: number; rotate: number; angle?: number; };
 const handleRatio = (
   deltaX: number,
   deltaY: number,
   type: string,
-  rotate: number,
   rect: Rect
 ) => {
+  let { centerX, centerY, width, height, rotate, angle } = rect;
   const alpha = Math.atan2(deltaY, deltaX);
   const deltaL = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   const beta = alpha - degToRadian(rotate);
   let deltaW = deltaL * Math.cos(beta);
   let deltaH = deltaL * Math.sin(beta);
-
-  let { centerX, centerY, width, height } = rect;
   switch (type) {
     case 'lt': {
       deltaW = -deltaW;
       deltaH = -deltaH;
       [width, deltaW] = setValue(width, deltaW);
       [height, deltaH] = setValue(height, deltaH);
+
+      if (angle) {
+        width = height * angle;
+        deltaW = deltaH * angle;
+      }
 
       centerX -= (deltaW / 2) * cos(rotate) - (deltaH / 2) * sin(rotate);
       centerY -= (deltaW / 2) * sin(rotate) + (deltaH / 2) * cos(rotate);
@@ -82,8 +89,17 @@ const handleRatio = (
       deltaH = -deltaH;
       [height, deltaH] = setValue(height, deltaH);
 
-      centerX += (deltaH / 2) * sin(rotate);
-      centerY -= (deltaH / 2) * cos(rotate);
+      if (angle) {
+        width = height * angle;
+        deltaW = deltaH * angle;
+
+        // 左下角固定
+        centerX += (deltaW / 2) * cos(rotate) + (deltaH / 2) * sin(rotate);
+        centerY += (deltaW / 2) * sin(rotate) - (deltaH / 2) * cos(rotate);
+      } else {
+        centerX += (deltaH / 2) * sin(rotate);
+        centerY -= (deltaH / 2) * cos(rotate);
+      }
       break;
     }
     case 'rt': {
@@ -91,30 +107,56 @@ const handleRatio = (
       [width, deltaW] = setValue(width, deltaW);
       [height, deltaH] = setValue(height, deltaH);
 
+      if (angle) {
+        deltaW = deltaH * angle;
+        width = height * angle;
+      }
       centerX += (deltaW / 2) * cos(rotate) + (deltaH / 2) * sin(rotate);
       centerY += (deltaW / 2) * sin(rotate) - (deltaH / 2) * cos(rotate);
       break;
     }
     case 'r': {
       [width, deltaW] = setValue(width, deltaW);
-      // 左边固定
-      centerX += (deltaW / 2) * cos(rotate);
-      centerY += (deltaW / 2) * sin(rotate);
+
+      if (angle) {
+        // 左上角固定
+        deltaH = deltaW / angle;
+        height = width / angle;
+        centerX += (deltaW / 2) * cos(rotate) - (deltaH / 2) * sin(rotate);
+        centerY += (deltaW / 2) * sin(rotate) + (deltaH / 2) * cos(rotate);
+      } else {
+        // 左边固定
+        centerX += (deltaW / 2) * cos(rotate);
+        centerY += (deltaW / 2) * sin(rotate);
+      }
       break;
     }
     case 'rb': {
       [width, deltaW] = setValue(width, deltaW);
       [height, deltaH] = setValue(height, deltaH);
 
+      if (angle) {
+        width = height * angle;
+        deltaW = deltaH * angle;
+      }
       centerX += (deltaW / 2) * cos(rotate) - (deltaH / 2) * sin(rotate);
       centerY += (deltaW / 2) * sin(rotate) + (deltaH / 2) * cos(rotate);
       break;
     }
     case 'b': {
       [height, deltaH] = setValue(height, deltaH);
-      // 上边固定
-      centerX -= (deltaH / 2) * sin(rotate);
-      centerY += (deltaH / 2) * cos(rotate);
+
+      if (angle) {
+        deltaW = deltaH * angle;
+        width = height * angle;
+        // 左上角固定
+        centerX += (deltaW / 2) * cos(rotate) - (deltaH / 2) * sin(rotate);
+        centerY += (deltaW / 2) * sin(rotate) + (deltaH / 2) * cos(rotate)
+      } else {
+        // 上边固定
+        centerX -= (deltaH / 2) * sin(rotate);
+        centerY += (deltaH / 2) * cos(rotate);
+      }
       break;
     }
     case 'lb': {
@@ -122,6 +164,10 @@ const handleRatio = (
       [width, deltaW] = setValue(width, deltaW);
       [height, deltaH] = setValue(height, deltaH);
 
+      if (angle) {
+        height = width / angle;
+        deltaH = deltaW / angle;
+      }
       centerX -= (deltaW / 2) * cos(rotate) + (deltaH / 2) * sin(rotate);
       centerY -= (deltaW / 2) * sin(rotate) - (deltaH / 2) * cos(rotate);
       break;
@@ -129,9 +175,18 @@ const handleRatio = (
     case 'l': {
       deltaW = -deltaW;
       [width, deltaW] = setValue(width, deltaW);
-      // 右边固定
-      centerX -= (deltaW / 2) * cos(rotate);
-      centerY -= (deltaW / 2) * sin(rotate);
+
+      if (angle) {
+        height = width / angle;
+        deltaH = deltaW / angle;
+        // 右上角固定
+        centerX -= (deltaW / 2) * cos(rotate) + (deltaH / 2) * sin(rotate);
+        centerY -= (deltaW / 2) * sin(rotate) - (deltaH / 2) * cos(rotate);
+      } else {
+        // 右边固定
+        centerX -= (deltaW / 2) * cos(rotate);
+        centerY -= (deltaW / 2) * sin(rotate);
+      }
     }
   }
 

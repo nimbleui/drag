@@ -15,19 +15,19 @@ const dotSite = {
 };
 
 const ROTATE_STYLE = `pointer-events: all;position: absolute;width: 15px;height: 15px;border-radius: 50%;transform: translateX(-50%);left: 50%;top: -25px;`;
-const GROUP_STYE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`;
+const AREA_STYE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`;
 
 interface Options {
   canvas: Element;
   dot: boolean;
   rotate: boolean;
-  group: boolean;
+  area: boolean;
   target: Element | null;
 }
 
 export function createElement(options: Options) {
   return () => {
-    const { canvas, dot, rotate, target, group } = options;
+    const { canvas, dot, rotate, target, area } = options;
     let content = canvas.querySelector('.drag-mask');
 
     if (!content) {
@@ -56,16 +56,16 @@ export function createElement(options: Options) {
     }
 
     // 创建组元素
-    let groupEl = canvas.querySelector(`[${DRAG_TYPE}='group']`);
-    if (group && !groupEl) {
-      groupEl = document.createElement('div');
-      groupEl.setAttribute(DRAG_TYPE, 'group');
-      groupEl.setAttribute('style', GROUP_STYE);
-      canvas.appendChild(groupEl);
+    let areaEl = canvas.querySelector(`[${DRAG_TYPE}='area']`);
+    if (area && !areaEl) {
+      areaEl = document.createElement('div');
+      areaEl.setAttribute(DRAG_TYPE, 'area');
+      areaEl.setAttribute('style', AREA_STYE);
+      canvas.appendChild(areaEl);
     }
     // 判断当前元素是否组元素
-    if (groupEl != target) {
-      (groupEl as HTMLElement).style.display = 'none';
+    if (areaEl && areaEl != target) {
+      (areaEl as HTMLElement).style.display = 'none';
     }
 
     // 判断有没有选择可以移动元素

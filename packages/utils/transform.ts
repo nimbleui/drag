@@ -1,3 +1,5 @@
+import { getRotationDegrees } from "./dom";
+
 export function objectTransform<
   T extends { [key: string]: any },
   K extends keyof T
@@ -43,4 +45,15 @@ export function getBoundingClientRectByScale(
   );
 
   return values;
+}
+
+/**
+ * 获取元素的位置信息
+ * @param el 目标元素
+ * @returns 
+ */
+export function getDOMSite(el: Element | HTMLElement) {
+  const { offsetHeight: height, offsetLeft: left, offsetTop: top, offsetWidth: width } = el as HTMLElement;
+  const angle = getRotationDegrees(el);
+  return { width, height, left, top, angle };
 }

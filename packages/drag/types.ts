@@ -63,7 +63,7 @@ export interface PluginOptions extends Common {
 }
 
 type PluginReturnValue = (data: any) => void;
-export type RunTarge = 'move' | 'dot' | 'canvas' | 'rotate' | 'group';
+export type RunTarge = 'move' | 'dot' | 'rotate' | 'area';
 export interface Plugin {
   /**
    * @description 插件的名称
@@ -91,6 +91,12 @@ export interface Plugin {
    * @param done 保存值给其他回调函数用
    */
   up?: (data: PluginOptions, done: PluginReturnValue) => void;
+  /**
+   * 按下就触发
+   * @param data 事件对象等 
+   * @returns 
+   */
+  allDown?: (data: PluginOptions) => void;
 }
 
 export interface SiteInfo {
