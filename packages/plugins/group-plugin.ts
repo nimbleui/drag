@@ -15,6 +15,15 @@ export function groupPlugin(): Plugin {
   return {
     name: 'group-plugin',
     runTarge: 'area',
+    allDown({ moveSite, canvasEl, currentEl }) {
+      const group = canvasEl.querySelector(`[${DRAG_GROUP}]`);
+      if (currentEl == group) return;
+
+      group && canvasEl.removeChild(group);
+      moveSite.forEach((item) => {
+        (item.el as HTMLElement).style.display = 'block'
+      })
+    },
     down({ canvasEl }, done) {
       const areaEl = canvasEl.querySelector(`[${DRAG_TYPE}='area']`);
       if (areaEl) {
@@ -97,11 +106,9 @@ export function groupPlugin(): Plugin {
         
         // 判断是否有旋转
         const angle = getRotationDegrees(el);
-        if (angle) {
-          groupEl.setAttribute(`${DRAG_GROUP}`, 'angle');
-        }
+        if (angle) groupEl.setAttribute(`${DRAG_GROUP}`, 'angle');
 
-        el.setAttribute(`${DRAG_GROUP_ID}`, `id-${id}`);
+        el.setAttribute(`${DRAG_GROUP_ID}`, `${id}`);
         (el as HTMLElement).style.display = 'none';
         groupEl.appendChild(item);
       })

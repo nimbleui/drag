@@ -96,7 +96,7 @@ export interface Plugin {
    * @param data 事件对象等 
    * @returns 
    */
-  allDown?: (data: PluginOptions) => void;
+  allDown?: (data: Omit<PluginOptions, 'funValue'>) => void;
 }
 
 export interface SiteInfo {

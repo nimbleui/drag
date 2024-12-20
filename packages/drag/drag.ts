@@ -13,7 +13,6 @@ import {
   getBoundingClientRectByScale,
   getDOMSite,
   getParentTarget,
-  getRotationDegrees,
   isFunctionOrValue,
   objectTransform,
 } from '@nimble-ui/utils';
@@ -30,11 +29,13 @@ function handlePlugins(plugins: Plugin[]) {
   const returnValue: Record<string, { down?: any; move?: any }> = {};
   return (
     type: 'down' | 'move' | 'up',
-    data: Omit<PluginOptions, 'funValue' | 'target'>
+    data: Omit<PluginOptions, 'funValue'>
   ) => {
     const elType = data.type || 'area';
     plugins.forEach((plugin) => {
-      const { runTarge, name } = plugin;
+      const { runTarge, name, allDown } = plugin;
+
+      type == 'down' && allDown?.({...data, type: elType});
       const checked = Array.isArray(runTarge)
         ? runTarge.includes(elType)
         : elType === runTarge;
@@ -131,7 +132,7 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
  * @param scale 缩放比例
  * @returns
  */
-function getMoveSite() {
+function getMoveSite(scale: number, canvasSite: Omit<MoveRect, "el">) {
   const currentEl = document.querySelector(`[${DRAG_ACTIVE}='true']`);
   const result: { list: SiteInfo[], obj: { [key: string]: SiteInfo } } = { list: [], obj: {} };
   if (!currentEl) return result;
@@ -148,10 +149,28 @@ function getMoveSite() {
 
   const els = currentEl.querySelectorAll(`[${DRAG_GROUP_ID}]`);
   els.forEach((el) => {
-    const { width, left, top, height, angle } = getDOMSite(el);
+    // 获元素对于浏览器视口位置大小
+    const { width, left, top, height } = getBoundingClientRectByScale(el, scale);
+    const { width: w, height: h, angle } = getDOMSite(el);
+    // 获取元素的中心点坐标
+    const center = {
+      x: left - canvasSite.left + width / 2,
+      y: top - canvasSite.top + height / 2
+    }
+
     const id = el.getAttribute(DRAG_ID);
-    const values = { left: left + site.left, angle: angle + site.angle, top: top + site.top, width, height };
-    
+    const values = { left: center.x - w / 2, top: center.y - h / 2, angle: angle + site.angle, width: w, height: h };
+    const moveEl = document.querySelector(`[${DRAG_GROUP_ID}='${el.getAttribute(DRAG_GROUP_ID)}'][${DRAG_TYPE}='move']`);
+    if (!moveEl) return;
+    const move = moveEl as HTMLElement;
+    move.style.top = `${values.top}px`;
+    move.style.left = `${values.left}px`;
+    move.style.width = `${values.width}px`;
+    move.style.height = `${values.height}px`;
+    move.style.transform = `rotate(${values.angle}deg)`;
+
+    result.list.push({ ...values, el: moveEl });
+    if (id) result.obj[id] = { ...values, el: moveEl };
   })
 
   return result;
@@ -232,7 +251,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down });
 
       if (down.currentEl) down.createEl();
-      const { list, obj } = getMoveSite();
+      const { list, obj } = getMoveSite(down.scale, down.canvasSite);
       if (list.length) changeSiteOrSize?.({ list, obj });
     },
     up(data, e, value) {
