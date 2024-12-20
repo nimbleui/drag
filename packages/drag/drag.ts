@@ -237,7 +237,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       return {
         createEl,
         currentEl,
-        scale,
+        scale: s,
         moveSite,
         currentSite,
         canvasSite,
