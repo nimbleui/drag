@@ -15,7 +15,8 @@ const dotSite = {
 };
 
 const ROTATE_STYLE = `pointer-events: all;position: absolute;width: 15px;height: 15px;border-radius: 50%;transform: translateX(-50%);left: 50%;top: -25px;`;
-const AREA_STYE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`;
+const AREA_STYE = `display: block;box-sizing: border-box;position: relative;width: 0;height: 0;z-index: 10000;`;
+const AREA_MASK_STYLE = `position: absolute;width: 100%;height: 100%;box-sizing: border-box;z-index: 99;border: 1px solid #1677ff;background-color: rgba(22, 119, 255, 0.3);`
 
 interface Options {
   canvas: Element;
@@ -61,6 +62,10 @@ export function createElement(options: Options) {
       areaEl = document.createElement('div');
       areaEl.setAttribute(DRAG_TYPE, 'area');
       areaEl.setAttribute('style', AREA_STYE);
+
+      const maskEl = document.createElement('div');
+      maskEl.setAttribute('style', AREA_MASK_STYLE);
+      areaEl.appendChild(maskEl);
       canvas.appendChild(areaEl);
     }
     // 判断当前元素是否组元素

@@ -80,7 +80,7 @@ export function groupPlugin(): Plugin {
       if (els.length < 2) return;
 
       // 计算组合元素的位置
-      const groupEl = areaEl.cloneNode() as HTMLElement;
+      const groupEl = areaEl.cloneNode(true) as HTMLElement;
       groupEl.setAttribute(`${DRAG_TYPE}`, 'move');
       groupEl.setAttribute(`${DRAG_GROUP}`, 'true');
 
