@@ -10,13 +10,16 @@ import type {
   SiteInfo,
 } from './types';
 import {
+  delAttr,
   getBoundingClientRectByScale,
   getDOMSite,
   getParentTarget,
+  handleAttr,
   isFunctionOrValue,
   objectTransform,
+  selectDOM,
 } from '@nimble-ui/utils';
-import { DRAG_TYPE, DRAG_ACTIVE, DRAG_DISABLED, DRAG_ID, DRAG_GROUP, DRAG_GROUP_ID } from "@nimble-ui/constant";
+import { DRAG_TYPE, DRAG_ACTIVE, DRAG_GROUP_ID } from "@nimble-ui/constant";
 import { createElement } from './createEl';
 
 /**
@@ -85,18 +88,18 @@ function getMoveDOM(target?: Element) {
  */
 function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, config: ConfigTypes) {
   // 获取所有可以移动的元素
-  const moves = canvas.querySelectorAll(`[${DRAG_TYPE}="move"]`);
+  const moves = selectDOM(canvas, `[${DRAG_TYPE}="move"]`, true);
 
   // 判断是否点击可操作的元素中
-  let type = target.getAttribute(DRAG_TYPE);
+  let type = handleAttr(target, 'type');
   let currentEl: Element | null = null;
 
   // 获取当前操作的元素
   if (!type || type == 'move') {
     currentEl = getMoveDOM(target);
-    currentEl && (type = currentEl?.getAttribute(DRAG_TYPE));
+    currentEl && (type = handleAttr(currentEl, 'type'));
   } else {
-    currentEl = canvas.querySelector(`[${DRAG_ACTIVE}="true"]`);
+    currentEl = selectDOM(canvas, `[${DRAG_ACTIVE}="true"]`);
   }
 
   let currentSite: Omit<MoveRect, 'el'> | null = null;
@@ -115,14 +118,20 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
     }
 
     // 移除选择的状态
-    el.removeAttribute(DRAG_ACTIVE);
+    delAttr(el, 'active');
+    // 获取id
+    const id = handleAttr(el, 'id');
     // 禁止元素拖拽
-    const isDisabled = config.disabled?.(el, el?.getAttribute(DRAG_ID));
-    isDisabled ? el.setAttribute(DRAG_DISABLED, 'true') : el.removeAttribute(DRAG_DISABLED);
+    const isDisabled = config.disabled?.(el, id);
+    isDisabled ? handleAttr(el, 'disabled', 'true') : delAttr(el, 'disabled');
+
+    // 是否等比例缩放
+    const isEqualRatio = config.equalRatio?.(el, id);
+    isEqualRatio ? handleAttr(el, 'ratio', 'true') : delAttr(el, 'ratio');
   }
 
   // 设置选择状态
-  currentEl?.setAttribute(DRAG_ACTIVE, 'true');
+  handleAttr(currentEl, 'active', 'true');
   return { currentEl, moveSite, currentSite, type: type as RunTarge };
 }
 
@@ -133,22 +142,22 @@ function getAllMoveSiteInfo(target: Element, scale: number, canvas: Element, con
  * @returns
  */
 function getMoveSite(scale: number, canvasSite: Omit<MoveRect, "el">) {
-  const currentEl = document.querySelector(`[${DRAG_ACTIVE}='true']`);
+  const currentEl = selectDOM(document, `[${DRAG_ACTIVE}='true']`);
   const result: { list: SiteInfo[], obj: { [key: string]: SiteInfo } } = { list: [], obj: {} };
   if (!currentEl) return result;
 
   const site = getDOMSite(currentEl);
-  const isGroup = currentEl?.getAttribute(DRAG_GROUP);
+  const isGroup = handleAttr(currentEl, 'group');
   // 判断当前是否组元素
   if (!isGroup) {
     result.list.push({ ...site, el: currentEl });
-    const id = currentEl.getAttribute(DRAG_ID);
+    const id = handleAttr(currentEl, 'id');
     if (id) result.obj[id] = { ...site, el: currentEl };
     return result;
   }
 
-  const els = currentEl.querySelectorAll(`[${DRAG_GROUP_ID}]`);
-  els.forEach((el) => {
+  const els = selectDOM(currentEl, `[${DRAG_GROUP_ID}]`, true);
+  els?.forEach((el) => {
     // 获元素对于浏览器视口位置大小
     const { width, left, top, height } = getBoundingClientRectByScale(el, scale);
     const { width: w, height: h, angle } = getDOMSite(el);
@@ -158,9 +167,9 @@ function getMoveSite(scale: number, canvasSite: Omit<MoveRect, "el">) {
       y: top - canvasSite.top + height / 2
     }
 
-    const id = el.getAttribute(DRAG_ID);
+    const id = handleAttr(currentEl, 'id');
     const values = { left: center.x - w / 2, top: center.y - h / 2, angle: angle + site.angle, width: w, height: h };
-    const moveEl = document.querySelector(`[${DRAG_GROUP_ID}='${el.getAttribute(DRAG_GROUP_ID)}'][${DRAG_TYPE}='move']`);
+    const moveEl = selectDOM(document, `[${DRAG_GROUP_ID}='${handleAttr(el, 'groupId')}'][${DRAG_TYPE}='move']`);
     if (!moveEl) return;
     const move = moveEl as HTMLElement;
     move.style.top = `${values.top}px`;
@@ -209,7 +218,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         config
       );
       // 判断是否禁用
-      if (currentEl?.getAttribute(DRAG_DISABLED) == 'true') return;
+      if (handleAttr(currentEl, 'disabled') == 'true') return;
       // 画布位置信息
       const canvasSite = getBoundingClientRectByScale(data.binElement!, s);
       // 点击的元素

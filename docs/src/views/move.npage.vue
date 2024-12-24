@@ -43,6 +43,7 @@ const getEl = () => warpRef.value!;
 drag(getEl, {
   scale: 1,
   disabled: (target, id) => id == '3',
+  equalRatio: (target, id) => id == '2' ,
   changeSiteOrSize({ obj }) {
     console.log(obj);
   },

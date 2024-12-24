@@ -135,10 +135,17 @@ export interface ConfigTypes {
     rotate?: { background?: string; borderColor?: string };
   });
   /**
-   * 禁止拖拽
+   * 禁止拖拽，或者直接在元素添加 data-drag-disabled="true"
    * @param target 当前点击的元素 
    * @param id 获取元素属性 data-drag-id 值
    * @returns {boolean}
    */
-  disabled?: (target: Element | null, id?: string | null) => boolean
+  disabled?: (target: Element | null, id?: string | null) => boolean;
+  /**
+   * 等比例缩放
+   * @param target 当前点击的元素
+   * @param id 获取元素属性 data-drag-id 值
+   * @returns 
+   */
+  equalRatio?: (target: Element | null, id?: string | null) => boolean;
 }

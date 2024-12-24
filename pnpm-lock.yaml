@@ -107,7 +107,11 @@ importers:
         specifier: workspace:^
         version: link:../utils
 
-  packages/utils: {}
+  packages/utils:
+    dependencies:
+      '@nimble-ui/constant':
+        specifier: workspace:^
+        version: link:../constant
 
 packages:
 

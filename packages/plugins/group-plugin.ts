@@ -1,5 +1,5 @@
 import { DRAG_TYPE, DRAG_DISABLED, DRAG_GROUP, DRAG_GROUP_ID } from "@nimble-ui/constant";
-import { createId, getRotationDegrees } from "@nimble-ui/utils";
+import { createId, delAttr, getRotationDegrees, handleAttr } from "@nimble-ui/utils";
 import type { Plugin } from '../drag/types';
 
 function setSite(
@@ -65,7 +65,7 @@ export function groupPlugin(): Plugin {
         const rReal = right - canvasSite.left;
 
         // 判断是否禁用
-        const isDisabled = move.el.getAttribute(DRAG_DISABLED) == 'true'
+        const isDisabled = handleAttr(move.el, 'disabled') == 'true'
         // 判断是否在区域内并且不是禁用的
         if (t < tReal && b > bReal && l < lReal && r > rReal && !isDisabled) {
           els.push(move.el);
@@ -81,8 +81,8 @@ export function groupPlugin(): Plugin {
 
       // 计算组合元素的位置
       const groupEl = areaEl.cloneNode(true) as HTMLElement;
-      groupEl.setAttribute(`${DRAG_TYPE}`, 'move');
-      groupEl.setAttribute(`${DRAG_GROUP}`, 'true');
+      handleAttr(groupEl, 'type', 'move');
+      handleAttr(groupEl, 'group', 'true');
 
       const w = maxX - minX;
       const h = maxY - minY;
@@ -101,14 +101,14 @@ export function groupPlugin(): Plugin {
         item.style.left = `${(left - minX) / w * 100}%`;
         item.style.width = `${width / w * 100}%`;
         item.style.height = `${height / h * 100}%`;
-        item.removeAttribute(`${DRAG_TYPE}`);
-        item.setAttribute(`${DRAG_GROUP_ID}`, id);
+        delAttr(item, 'type');
+        handleAttr(item, 'groupId', id)
         
         // 判断是否有旋转
         const angle = getRotationDegrees(el);
-        if (angle) groupEl.setAttribute(`${DRAG_GROUP}`, 'angle');
+        if (angle) handleAttr(groupEl, 'group', 'angle');
 
-        el.setAttribute(`${DRAG_GROUP_ID}`, `${id}`);
+        handleAttr(el, 'groupId', id);
         (el as HTMLElement).style.display = 'none';
         groupEl.appendChild(item);
       })

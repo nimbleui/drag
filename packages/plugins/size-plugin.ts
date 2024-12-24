@@ -1,6 +1,5 @@
-import { DRAG_GROUP } from '@nimble-ui/constant';
 import type { Plugin } from '../drag/types';
-import { getRotationDegrees } from '@nimble-ui/utils';
+import { getRotationDegrees, handleAttr } from '@nimble-ui/utils';
 
 interface Options {}
 
@@ -27,14 +26,15 @@ export function sizePlugin(options?: Options): Plugin {
     move({ disX, disY, funValue, currentEl, currentSite }) {
       const { l, t, w, h, direction } = funValue.down;
 
-      const isGroup = currentEl?.getAttribute(`${DRAG_GROUP}`);
+      const isGroup = handleAttr(currentEl, 'group');
+      const isEqualRatio = handleAttr(currentEl, 'ratio');
       const result = handleRatio(disX, disY, direction, {
         centerX: l + w / 2,
         centerY: t + h / 2,
         width: w,
         height: h,
         rotate: getRotationDegrees(currentEl),
-        angle: isGroup == 'angle' ? currentSite!.width / currentSite!.height : undefined,
+        angle: isGroup == 'angle' || isEqualRatio ? currentSite!.width / currentSite!.height : undefined,
       });
       const el = currentEl as HTMLElement;
       el.style.left = `${result.left}px`;
