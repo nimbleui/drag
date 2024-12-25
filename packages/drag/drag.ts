@@ -8,6 +8,8 @@ import type {
   PluginOptions,
   ReturnData,
   SiteInfo,
+  EventType,
+  HandleEvent,
 } from './types';
 import {
   delAttr,
@@ -19,7 +21,7 @@ import {
   objectTransform,
   selectDOM,
 } from '@nimble-ui/utils';
-import { DRAG_TYPE, DRAG_ACTIVE, DRAG_GROUP_ID } from "@nimble-ui/constant";
+import { DRAG_TYPE, DRAG_ACTIVE, DRAG_GROUP_ID, DRAG_GROUP } from "@nimble-ui/constant";
 import { createElement } from './createEl';
 
 /**
@@ -167,7 +169,7 @@ function getMoveSite(scale: number, canvasSite: Omit<MoveRect, "el">) {
       y: top - canvasSite.top + height / 2
     }
 
-    const id = handleAttr(currentEl, 'id');
+    const id = handleAttr(el, 'id');
     const values = { left: center.x - w / 2, top: center.y - h / 2, angle: angle + site.angle, width: w, height: h };
     const moveEl = selectDOM(document, `[${DRAG_GROUP_ID}='${handleAttr(el, 'groupId')}'][${DRAG_TYPE}='move']`);
     if (!moveEl) return;
@@ -181,8 +183,44 @@ function getMoveSite(scale: number, canvasSite: Omit<MoveRect, "el">) {
     result.list.push({ ...values, el: moveEl });
     if (id) result.obj[id] = { ...values, el: moveEl };
   })
-
   return result;
+}
+
+/** 取消选中 */
+function uncheck(el: () => Element) {
+  return () => {
+    const canvasEl = el();
+    delAttr(selectDOM(canvasEl, `[${DRAG_ACTIVE}='true']`), 'active');
+    selectDOM(canvasEl, '.drag-mask')?.setAttribute('style', 'display: none;');
+    const group = selectDOM(canvasEl, DRAG_GROUP);
+    group && canvasEl.removeChild(group);
+    const moves = selectDOM(canvasEl, `[${DRAG_TYPE}="move"]`, true);
+    moves?.forEach((el) => el.setAttribute("style", 'display: none;'))
+  }
+}
+
+function createBindEvent() {
+  const all = new Map<EventType, Array<HandleEvent>>();
+
+  return {
+    on: (type: EventType, handler: HandleEvent) => {
+      const handlers = all.get(type);
+      if (handlers) {
+        handlers.push(handler)
+      } else {
+        all.set(type, [handler])
+      }
+    },
+    emit(type: RunTarge | null, event: { scale: number; canvasSite: Omit<MoveRect, "el"> }, status?: 'start' | 'end') {
+      const key = type == 'dot' ? 'resize' : type == 'rotate' ? 'rotate' : type == 'move' ? 'drag' : ''
+      if (!key) return;
+      const list = all.get(`${key}${status ? '-' + status : ''}` as EventType);
+      const data = getMoveSite(event.scale, event.canvasSite);
+      list?.forEach((handler) => handler(data));
+
+      !status && all.get('change')?.forEach((handler) => handler(data));
+    }
+  }
 }
 
 const keys = [
@@ -202,7 +240,9 @@ export function drag(el: () => Element, config: ConfigTypes) {
   const pluginType = handlePlugins(plugins);
   const usePlugins = getCitePlugins(plugins);
 
-  return elDrag(el, {
+  const events = createBindEvent();
+
+  const data = elDrag(el, {
     scale,
     stop: true,
     prevent: true,
@@ -230,6 +270,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         canvas: data.binElement!,
       });
       createEl();
+      events.emit(type, { scale: s, canvasSite }, 'start');
 
       pluginType('down', {
         ...values,
@@ -262,11 +303,15 @@ export function drag(el: () => Element, config: ConfigTypes) {
       if (down.currentEl) down.createEl();
       const { list, obj } = getMoveSite(down.scale, down.canvasSite);
       if (list.length) changeSiteOrSize?.({ list, obj });
+      events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite });
     },
     up(data, e, value) {
       const down = value.down as ReturnData;
       const values = objectTransform(data, keys);
       pluginType('up', { canvasEl: data.binElement!, e, ...values, ...down });
+      events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite }, "end");
     },
   });
+
+  return { ...data, uncheck: uncheck(el), on: events.on }
 }

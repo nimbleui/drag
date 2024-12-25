@@ -149,3 +149,16 @@ export interface ConfigTypes {
    */
   equalRatio?: (target: Element | null, id?: string | null) => boolean;
 }
+
+export type EventType =
+  "change" |
+  "drag" |
+  "drag-start" |
+  "drag-end" |
+  "resize" |
+  "resize-start" |
+  "resize-end" |
+  "rotate" |
+  "rotate-start" |
+  "rotate-end"
+export type HandleEvent = (data: ChangeParams) => void

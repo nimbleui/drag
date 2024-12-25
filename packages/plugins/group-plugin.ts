@@ -44,7 +44,8 @@ export function groupPlugin(): Plugin {
       setSite(areaEl, { width, height, top, left });
       done({ width, height, top, left });
     },
-    up({ moveSite, funValue, canvasSite, canvasEl }) {
+    up({ moveSite, funValue, canvasSite, canvasEl, isMove }) {
+      if (!isMove) return;
       const { areaEl } = funValue.down;
       const { width, height, top: t, left: l } = funValue.move;
       const b = t + height;

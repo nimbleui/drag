@@ -40,13 +40,10 @@ const list = reactive([
 const warpRef = ref<HTMLElement>();
 const getEl = () => warpRef.value!;
 
-drag(getEl, {
+const dragData = drag(getEl, {
   scale: 1,
   disabled: (target, id) => id == '3',
   equalRatio: (target, id) => id == '2' ,
-  changeSiteOrSize({ obj }) {
-    console.log(obj);
-  },
   plugins: [
     movePlugin(),
     sizePlugin(),
@@ -55,6 +52,12 @@ drag(getEl, {
     groupPlugin(),
   ],
 });
+dragData.on('change', ({obj}) => {
+  console.log('change', obj)
+})
+dragData.on("drag", ({obj}) => {
+  console.log(obj)
+})
 </script>
 
 <style lang="scss">

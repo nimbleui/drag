@@ -33,12 +33,15 @@ export function elDrag(el: ElType, options?: OptionsType) {
     callbackReturnValue: {},
   };
 
-  const changeTarget = () => {};
+  const changeTarget = () => { };
+  
+  let isDown = false
 
   // 按下事件
   function mousedown(e: MouseTouchEvent) {
     // 执行参数更新
     setTarget?.(e);
+    isDown = true
 
     const res = getTarget(e, el, _options);
     if (!res) return;
@@ -46,7 +49,7 @@ export function elDrag(el: ElType, options?: OptionsType) {
     data.binElement = this;
 
     const { clientX, clientY } = numScale(e, _options);
-    Object.assign(data, { isMove: true, startX: clientX, startY: clientY });
+    Object.assign(data, { startX: clientX, startY: clientY });
     _options?.stop && e.stopPropagation(); // 阻止事件冒泡
     _options?.prevent && e.preventDefault(); // 阻止默认事件
 
@@ -68,11 +71,12 @@ export function elDrag(el: ElType, options?: OptionsType) {
   }
 
   function mousemove(e: MouseTouchEvent) {
-    if (!data.isMove) return;
+    if (!isDown) return;
     // 执行参数更新
     // updateOptions?.(_options);
     _options?.stop && e.stopPropagation(); // 阻止事件冒泡
     _options?.prevent && e.preventDefault(); // 阻止默认事件
+    data.isMove = true;
 
     const { clientX, clientY } = numScale(e, _options);
     const { startX, startY } = data;
@@ -94,14 +98,15 @@ export function elDrag(el: ElType, options?: OptionsType) {
   }
 
   function mouseup(e: MouseTouchEvent) {
-    if (!data.isMove) return;
+    if (!isDown) return;
     // 执行参数更新
     // updateOptions?.(_options);
     _options?.stop && e.stopPropagation();
     _options?.prevent && e.preventDefault();
+    isDown = false;
 
     const { clientX: endX, clientY: endY } = numScale(e, _options);
-    Object.assign(data, { endX, endY, isMove: false });
+    Object.assign(data, { endX, endY });
     _options?.up?.({ ...data }, e, { ..._value.callbackReturnValue });
     Object.assign(data, defaultData);
     _value.limitInfo = null;
