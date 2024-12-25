@@ -114,7 +114,7 @@ import drag from "@nimble-ui/drag"
 | uncheck | 取消选中     | () => void               |
 | on      | 绑定事件     | (type, callback) => void |
 
-### 支持事件
+### on支持事件
 | 事件名     | 说明            | 类型                         |
 | ------------ | ------------ | ---------------------------- |
 | change       | 位置、大小改变 | (data: ChangeParams) => void |
@@ -124,7 +124,8 @@ import drag from "@nimble-ui/drag"
 | resize       | 缩放中        | (data: ChangeParams) => void |
 | resize-start | 旋转开始      | (data: ChangeParams) => void |
 | resize-end   | 旋转结束      | (data: ChangeParams) => void |
-#### data类型
+
+#### ChangeParams类型
 ```ts
 interface DataItem {
   el: Element;
