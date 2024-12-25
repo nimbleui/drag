@@ -59,13 +59,9 @@ const list = reactive([
 const warpRef = ref<HTMLElement>()
 const getEl = () => warpRef.value!
 
-drag(getEl, {
+const { on } = drag(getEl, {
   scale: 1,
   disabled: (target, id) => id == '3',
-  changeSiteOrSize({list, obj}) {
-    console.log(list) // 返回数组
-    console.log(obj) // 如果元素有data-drag-id属性才有值 
-  },
   plugins: [
     movePlugin(), // 拖拽插件
     sizePlugin(), // 放大缩小插件
@@ -75,6 +71,16 @@ drag(getEl, {
   ],
 })
 
+on('change', ({list, obj}) => {
+  console.log(list) // 返回数组
+  console.log(obj) // 如果元素有data-drag-id属性才有值
+})
+on("drag", ({list, obj}) => {
+  console.log(obj)
+})
+on("resize", ({list, obj}) => {
+  console.log(obj)
+})
 </script>
 ```
 
@@ -100,3 +106,33 @@ import drag from "@nimble-ui/drag"
 | limitBoundary    | 限制移出画布(未实现)               | boolean                |  -  |
 | changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void |  -  |
 | disabled         | 禁止拖拽                          | (target, id) => boolean | - |
+
+## drag 返回值
+| 属性名  | 说明         | 类型                     |
+| ------- | ----------- | ------------------------ |
+| data    | 返回改变数据 | Object                   |
+| uncheck | 取消选中     | () => void               |
+| on      | 绑定事件     | (type, callback) => void |
+
+### 支持事件
+| 事件名     | 说明            | 类型                         |
+| ------------ | ------------ | ---------------------------- |
+| change       | 位置、大小改变 | (data: ChangeParams) => void |
+| drag         | 拖拽中        | (data: ChangeParams) => void |
+| drag-start   | 拖拽开始      | (data: ChangeParams) => void |
+| drag-end     | 拖拽结束      | (data: ChangeParams) => void |
+| resize       | 缩放中        | (data: ChangeParams) => void |
+| resize-start | 旋转开始      | (data: ChangeParams) => void |
+| resize-end   | 旋转结束      | (data: ChangeParams) => void |
+#### data类型
+```ts
+interface DataItem {
+  el: Element;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  angle: number;
+}
+type ChangeParams = { list: []; obj: []; }
+```
