@@ -1,4 +1,7 @@
 <template>
+  <div>
+
+  </div>
   <div ref="warpRef" class="warp">
     <div
       v-for="item in list"
@@ -18,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import {
   drag,
   movePlugin,
@@ -58,6 +61,7 @@ dragData.on('change', ({obj}) => {
 dragData.on("drag", ({obj}) => {
   console.log(obj)
 })
+onBeforeUnmount(dragData.destroy)
 </script>
 
 <style lang="scss">

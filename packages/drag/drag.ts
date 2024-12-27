@@ -10,6 +10,7 @@ import type {
   SiteInfo,
   EventType,
   HandleEvent,
+  KeyEqualFun,
 } from './types';
 import {
   delAttr,
@@ -17,6 +18,7 @@ import {
   getDOMSite,
   getParentTarget,
   handleAttr,
+  isFunction,
   isFunctionOrValue,
   objectTransform,
   selectDOM,
@@ -34,11 +36,13 @@ function handlePlugins(plugins: Plugin[]) {
   const returnValue: Record<string, { down?: any; move?: any }> = {};
   return (
     type: 'down' | 'move' | 'up',
-    data: Omit<PluginOptions, 'funValue'>
+    data: Omit<PluginOptions, 'funValue'> & { keyEqual: KeyEqualFun}
   ) => {
-    const elType = data.type || 'area';
+    const elType = data.type || 'canvas';
     plugins.forEach((plugin) => {
-      const { runTarge, name, allDown } = plugin;
+      const { runTarge, name, allDown, keyDown } = plugin;
+      const checkedKey = data.keyEqual(keyDown);
+      if (!checkedKey) return;
 
       type == 'down' && allDown?.({...data, type: elType});
       const checked = Array.isArray(runTarge)
@@ -199,6 +203,9 @@ function uncheck(el: () => Element) {
   }
 }
 
+/**
+ * 创建事件 
+ */
 function createBindEvent() {
   const all = new Map<EventType, Array<HandleEvent>>();
 
@@ -223,6 +230,33 @@ function createBindEvent() {
   }
 }
 
+function bindKeyUp() {
+  const data = { key: 0, event: null as null | KeyboardEvent }
+  const keyDown = (e: KeyboardEvent) => {
+    data.event = e;
+    data.key = e.keyCode;
+  }
+
+  const keyUp = () => {
+    data.key = 0;
+    data.event = null;
+  };
+  document.addEventListener("keydown", keyDown);
+  document.addEventListener("keyup", keyUp)
+
+  return {
+    keyEqual: ((key) => {
+      if (!key && !data.key) return true;
+      if (data.key && !key || !data.key && key) return false;
+      return isFunction(key) ? key(data.event) : data.key == key
+    }) as KeyEqualFun,
+    remove: () => {
+      document.removeEventListener("keyup", keyUp);
+      document.removeEventListener('keydown', keyDown);
+    }
+  }
+}
+
 const keys = [
   'disX',
   'disY',
@@ -239,7 +273,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
   const { plugins = [], scale, changeSiteOrSize } = config;
   const pluginType = handlePlugins(plugins);
   const usePlugins = getCitePlugins(plugins);
-
+  const keyword = bindKeyUp();
   const events = createBindEvent();
 
   const data = elDrag(el, {
@@ -283,6 +317,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         canvasSite,
         eventTarget,
         canvasEl: data.binElement!,
+        keyEqual: keyword.keyEqual,
       });
       return {
         createEl,
@@ -298,7 +333,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
     move(data, e, value) {
       const down = value.down as ReturnData;
       const values = objectTransform(data, keys);
-      pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down });
+      pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down, keyEqual: keyword.keyEqual, });
 
       if (down.currentEl) down.createEl();
       const { list, obj } = getMoveSite(down.scale, down.canvasSite);
@@ -308,10 +343,18 @@ export function drag(el: () => Element, config: ConfigTypes) {
     up(data, e, value) {
       const down = value.down as ReturnData;
       const values = objectTransform(data, keys);
-      pluginType('up', { canvasEl: data.binElement!, e, ...values, ...down });
+      pluginType('up', { canvasEl: data.binElement!, e, ...values, ...down, keyEqual: keyword.keyEqual, });
       events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite }, "end");
     },
   });
 
-  return { ...data, uncheck: uncheck(el), on: events.on }
+  return {
+    on: events.on,
+    data: data.data,
+    uncheck: uncheck(el),
+    destroy: () => {
+      keyword.remove();
+      data.observe.disconnect();
+    }
+  }
 }

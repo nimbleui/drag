@@ -44,7 +44,7 @@ pnpm i @nimble-ui/drag
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, onBeforeUnmount } from 'vue';
 import drag, { movePlugin, sizePlugin, guidelinesPlugin, rotatePlugin, groupPlugin } from '@nimble-ui/drag';
 
 defineOptions({ name: 'move' })
@@ -81,6 +81,8 @@ on("drag", ({list, obj}) => {
 on("resize", ({list, obj}) => {
   console.log(obj)
 })
+// 销毁绑定的事件等
+onBeforeUnmount(dragData.destroy)
 </script>
 ```
 
@@ -105,14 +107,15 @@ import drag from "@nimble-ui/drag"
 | scale            | 画布缩放比例                      | number \| () => number |  -  |
 | limitBoundary    | 限制移出画布(未实现)               | boolean                |  -  |
 | changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void |  -  |
-| disabled         | 禁止拖拽                          | (target, id) => boolean | - |
+| disabled         | 禁止拖拽                          | (target, id) => boolean | -  |
 
 ## drag 返回值
 | 属性名  | 说明         | 类型                     |
 | ------- | ----------- | ------------------------ |
 | data    | 返回改变数据 | Object                   |
-| uncheck | 取消选中     | () => void               |
+| uncheck | 取消选中     | Function                 |
 | on      | 绑定事件     | (type, callback) => void |
+| destroy | 销毁绑定事件等| Function                |
 
 ### on支持事件
 | 事件名     | 说明            | 类型                         |

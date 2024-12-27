@@ -22,13 +22,12 @@ interface Options {
   canvas: Element;
   dot: boolean;
   rotate: boolean;
-  area: boolean;
   target: Element | null;
 }
 
 export function createElement(options: Options) {
   return () => {
-    const { canvas, dot, rotate, target, area } = options;
+    const { canvas, dot, rotate, target } = options;
     let content = canvas.querySelector('.drag-mask');
 
     if (!content) {
@@ -54,11 +53,12 @@ export function createElement(options: Options) {
         el.setAttribute('style', `${ROTATE_STYLE}background: #1677ff;`);
         content.appendChild(el);
       }
+      canvas.appendChild(content);
     }
 
     // 创建组元素
     let areaEl = canvas.querySelector(`[${DRAG_TYPE}='area']`);
-    if (area && !areaEl) {
+    if (!areaEl) {
       areaEl = document.createElement('div');
       areaEl.setAttribute(DRAG_TYPE, 'area');
       areaEl.setAttribute('style', AREA_STYE);
@@ -67,10 +67,6 @@ export function createElement(options: Options) {
       maskEl.setAttribute('style', AREA_MASK_STYLE);
       areaEl.appendChild(maskEl);
       canvas.appendChild(areaEl);
-    }
-    // 判断当前元素是否组元素
-    if (areaEl && areaEl != target) {
-      (areaEl as HTMLElement).style.display = 'none';
     }
 
     // 判断有没有选择可以移动元素
@@ -86,7 +82,5 @@ export function createElement(options: Options) {
         t.offsetHeight
       }px;transform: rotate(${getRotationDegrees(t)}deg);`
     );
-    canvas.appendChild(content);
-    return content;
   };
 }

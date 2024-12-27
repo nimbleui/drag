@@ -63,7 +63,7 @@ export interface PluginOptions extends Common {
 }
 
 type PluginReturnValue = (data: any) => void;
-export type RunTarge = 'move' | 'dot' | 'rotate' | 'area';
+export type RunTarge = 'move' | 'dot' | 'rotate' | 'canvas';
 export interface Plugin {
   /**
    * @description 插件的名称
@@ -97,6 +97,10 @@ export interface Plugin {
    * @returns 
    */
   allDown?: (data: Omit<PluginOptions, 'funValue'>) => void;
+  /**
+   * @description 配合按键
+   */
+  keyDown?: KeyDownType;
 }
 
 export interface SiteInfo {
@@ -161,4 +165,7 @@ export type EventType =
   "rotate" |
   "rotate-start" |
   "rotate-end"
-export type HandleEvent = (data: ChangeParams) => void
+export type HandleEvent = (data: ChangeParams) => void;
+
+type KeyDownType = number | ((e: KeyboardEvent | null) => boolean);
+export type KeyEqualFun = (key?: KeyDownType) => boolean;

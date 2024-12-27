@@ -1,4 +1,4 @@
-import { DRAG_TYPE, DRAG_DISABLED, DRAG_GROUP, DRAG_GROUP_ID } from "@nimble-ui/constant";
+import { DRAG_TYPE, DRAG_GROUP } from "@nimble-ui/constant";
 import { createId, delAttr, getRotationDegrees, handleAttr } from "@nimble-ui/utils";
 import type { Plugin } from '../drag/types';
 
@@ -14,7 +14,7 @@ function setSite(
 export function groupPlugin(): Plugin {
   return {
     name: 'group-plugin',
-    runTarge: 'area',
+    runTarge: 'canvas',
     allDown({ moveSite, canvasEl, currentEl }) {
       const group = canvasEl.querySelector(`[${DRAG_GROUP}]`);
       if (currentEl == group) return;
