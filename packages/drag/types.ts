@@ -1,11 +1,11 @@
 import type {
-  OptionsType,
-  BaseOptions,
-  ElType,
-  DataTypes,
-  MouseTouchEvent,
+  MoveOptionsType,
+  MoveBaseOptions,
+  MoveElType,
+  MoveDataTypes,
+  MoveMouseTouchEvent,
 } from '@nimble-ui/move';
-export { ElType, OptionsType, DataTypes, MouseTouchEvent };
+export { MoveElType, MoveOptionsType, MoveDataTypes, MoveMouseTouchEvent };
 
 export interface MoveRect {
   left: number;
@@ -57,7 +57,7 @@ export interface PluginOptions extends Common {
   /** 是否移动 */
   isMove: boolean;
   /** 事件对象 */
-  e: MouseTouchEvent;
+  e: MoveMouseTouchEvent;
   /** 函数的返回值 */
   funValue: { down?: any; move?: any; up?: any };
 }

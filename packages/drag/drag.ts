@@ -1,4 +1,4 @@
-import { elDrag } from '@nimble-ui/move';
+import move from '@nimble-ui/move';
 import type {
   ConfigTypes,
   RunTarge,
@@ -270,23 +270,34 @@ const keys = [
 >;
 
 export function drag(el: () => Element, config: ConfigTypes) {
-  const { plugins = [], scale, changeSiteOrSize } = config;
+  const { plugins = [], scale, changeSiteOrSize, limitBoundary } = config;
   const pluginType = handlePlugins(plugins);
   const usePlugins = getCitePlugins(plugins);
   const keyword = bindKeyUp();
   const events = createBindEvent();
 
-  const data = elDrag(el, {
+  const data = move(el, {
     scale,
     stop: true,
     prevent: true,
-    down(data, e) {
+    boundary: limitBoundary ? el : undefined,
+    changeTarget(el, e) {
+      let target = e.target as HTMLElement;
+      const warp = isFunctionOrValue(el);
+      while (target != warp) {
+        if (target.getAttribute(DRAG_TYPE) == 'move') return target;
+        if (!target.parentElement) break;
+        target = target.parentElement;
+      }
+      return el;
+    },
+    down(data, done) {
       const values = objectTransform(data, keys);
       // 缩放比例
       const s = isFunctionOrValue(scale) || 1;
       // 移动元素的宽高、大小
       const { moveSite, currentEl, currentSite, type } = getAllMoveSiteInfo(
-        e.target as Element,
+        data.e.target as Element,
         s,
         data.binElement!,
         config
@@ -296,7 +307,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       // 画布位置信息
       const canvasSite = getBoundingClientRectByScale(data.binElement!, s);
       // 点击的元素
-      const eventTarget = e.target as HTMLElement;
+      const eventTarget = data.e.target as HTMLElement;
       // 创建点
       const createEl = createElement({
         ...usePlugins,
@@ -308,7 +319,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
 
       pluginType('down', {
         ...values,
-        e,
+        e: data.e,
         type,
         scale: s,
         moveSite,
@@ -319,7 +330,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         canvasEl: data.binElement!,
         keyEqual: keyword.keyEqual,
       });
-      return {
+      done({
         createEl,
         currentEl,
         scale: s,
@@ -328,23 +339,23 @@ export function drag(el: () => Element, config: ConfigTypes) {
         canvasSite,
         eventTarget,
         type,
-      };
+      })
     },
-    move(data, e, value) {
-      const down = value.down as ReturnData;
+    move(data) {
+      const down = data.value.down as ReturnData;
       const values = objectTransform(data, keys);
-      pluginType('move', { canvasEl: data.binElement!, e, ...values, ...down, keyEqual: keyword.keyEqual, });
+      pluginType('move', { canvasEl: data.binElement!, e: data.e, ...values, ...down, keyEqual: keyword.keyEqual, });
 
       if (down.currentEl) down.createEl();
       const { list, obj } = getMoveSite(down.scale, down.canvasSite);
       if (list.length) changeSiteOrSize?.({ list, obj });
       events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite });
     },
-    up(data, e, value) {
-      const down = value.down as ReturnData;
+    up(data) {
+      const down = data.value.down as ReturnData;
       const values = objectTransform(data, keys);
-      pluginType('up', { canvasEl: data.binElement!, e, ...values, ...down, keyEqual: keyword.keyEqual, });
-      events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite }, "end");
+      pluginType('up', { canvasEl: data.binElement!, e: data.e, ...values, ...down, keyEqual: keyword.keyEqual });
+      events.emit(down?.type, { scale: down.scale, canvasSite: down.canvasSite }, "end");
     },
   });
 

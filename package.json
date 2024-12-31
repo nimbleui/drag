@@ -12,7 +12,6 @@
   "workspaces": [
     "packages/utils",
     "packages/drag",
-    "packages/move",
     "docs",
     "build",
     "packages/constant"

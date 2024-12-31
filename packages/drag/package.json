@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@nimble-ui/constant": "workspace:^",
-    "@nimble-ui/move": "workspace:^",
+    "@nimble-ui/move": "^1.0.4",
     "@nimble-ui/utils": "workspace:^"
   }
 }

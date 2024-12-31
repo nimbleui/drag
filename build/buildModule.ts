@@ -17,6 +17,7 @@ export const buildModules = async () => {
       commonjs(),
     ],
     treeshake: false,
+    external: ["@nimble-ui/move", "move"]
   });
 
   await writeBundles(bundle, [

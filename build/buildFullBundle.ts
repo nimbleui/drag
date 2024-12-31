@@ -20,6 +20,7 @@ export async function buildFullBundle() {
       minify({ target: 'es2015', minify: true }),
     ],
     treeshake: true,
+    external: ["@nimble-ui/move"]
   });
 
   await writeBundles(bundle, [
@@ -29,6 +30,9 @@ export async function buildFullBundle() {
       exports: 'named',
       name: 'yDrag',
       sourcemap: false,
+      globals(name) {
+        return name == '@nimble-ui/move' ? 'yMove' : name
+      },
     },
     {
       format: 'esm',
