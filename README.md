@@ -105,7 +105,7 @@ import drag from "@nimble-ui/drag"
 |------------------| -------------------------------- | --------------------- | ---- |
 | plugins          | 插件                              | Array                 |  -  |
 | scale            | 画布缩放比例                      | number \| () => number |  -  |
-| limitBoundary    | 限制移出画布(未实现)               | boolean                |  -  |
+| limitBoundary    | 限制移出画布                       | boolean                |  -  |
 | changeSiteOrSize | 改变位置、大小、旋转角度触发这个方法 | (target, data) => void |  -  |
 | disabled         | 禁止拖拽                          | (target, id) => boolean | -  |
 
