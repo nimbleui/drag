@@ -289,7 +289,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
         if (!target.parentElement) break;
         target = target.parentElement;
       }
-      return el;
+      return el.querySelector(`[${DRAG_TYPE}='area']`) || el;
     },
     down(data, done) {
       const values = objectTransform(data, keys);
