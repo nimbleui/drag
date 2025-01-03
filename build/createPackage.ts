@@ -39,7 +39,7 @@ const pkg = {
     access: 'public',
   },
   dependencies: {
-    "@nimble-ui/move": "^1.0.4",
+    "@nimble-ui/move": "^1.0.6",
   },
   exports: {
     '.': {

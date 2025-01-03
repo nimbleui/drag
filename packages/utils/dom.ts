@@ -51,3 +51,18 @@ export function selectDOM(el: Element | Document, query: string, isAll: boolean)
 export function selectDOM(el: Element | Document, query: string, isAll?: boolean) {
   return isAll ?  el.querySelectorAll(query) : el.querySelector(query);
 }
+
+/**
+ * 设置样式
+ * @param el 目标元素 
+ * @param style 样式：[left, top, width, height, display]
+ */
+export function setStyle(el: Element | null, styles: (number | string)[]) {
+  if (!el) return;
+  const keys = ['left', 'top', 'width', 'height', "display"];
+  styles.forEach((val, i) => {
+    if (val != null) {
+      (el as HTMLElement).style[keys[i]] = typeof val == 'number' ? `${val}px` : val;
+    }
+  })
+}

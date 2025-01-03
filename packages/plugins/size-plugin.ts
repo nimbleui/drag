@@ -1,5 +1,5 @@
 import type { Plugin } from '../drag/types';
-import { getRotationDegrees, handleAttr } from '@nimble-ui/utils';
+import { getRotationDegrees, handleAttr, setStyle } from '@nimble-ui/utils';
 
 interface Options {}
 
@@ -36,11 +36,7 @@ export function sizePlugin(options?: Options): Plugin {
         rotate: getRotationDegrees(currentEl),
         angle: isGroup == 'angle' || isEqualRatio ? currentSite!.width / currentSite!.height : undefined,
       });
-      const el = currentEl as HTMLElement;
-      el.style.left = `${result.left}px`;
-      el.style.top = `${result.top}px`;
-      el.style.height = `${result.height}px`;
-      el.style.width = `${result.width}px`;
+      setStyle(currentEl, [result.left, result.top, result.width, result.height])
     },
   };
 }

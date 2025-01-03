@@ -1,15 +1,6 @@
 import { DRAG_TYPE, DRAG_GROUP } from "@nimble-ui/constant";
-import { createId, delAttr, getRotationDegrees, handleAttr } from "@nimble-ui/utils";
+import { createId, delAttr, getRotationDegrees, handleAttr, setStyle } from "@nimble-ui/utils";
 import type { Plugin } from '../drag/types';
-
-function setSite(
-  el: HTMLElement,
-  data: { left: number; top: number; width: number; height: number }
-) {
-  Object.keys(data).forEach((key: string) => {
-    el.style[key] = `${data[key]}px`;
-  });
-}
 
 export function groupPlugin(): Plugin {
   return {
@@ -24,24 +15,21 @@ export function groupPlugin(): Plugin {
         (item.el as HTMLElement).style.display = 'block'
       })
     },
-    down({ canvasEl }, done) {
+    down({ canvasEl, startX, startY, canvasSite }, done) {
       const areaEl = canvasEl.querySelector(`[${DRAG_TYPE}='area']`);
-      if (areaEl) {
-        (areaEl as HTMLElement).style.display = 'none';
-      }
-      done({ areaEl });
-    },
-    move({ disX, disY, funValue, startX, startY, canvasSite }, done) {
-      const { areaEl } = funValue.down;
       const x = startX - canvasSite.left;
       const y = startY - canvasSite.top;
-      areaEl.style.display = 'block';
+      setStyle(areaEl, [x, y, 0, 0]);
+      done({ areaEl, x, y });
+    },
+    move({ disX, disY, funValue }, done) {
+      const { areaEl, x, y } = funValue.down;
 
       const width = Math.abs(disX);
       const height = Math.abs(disY);
       const top = disY < 0 ? y + disY : y;
       const left = disX < 0 ? x + disX : x;
-      setSite(areaEl, { width, height, top, left });
+      setStyle(areaEl, [left, top, width, height, 'block'])
       done({ width, height, top, left });
     },
     up({ moveSite, funValue, canvasSite, canvasEl, isMove }) {
@@ -77,7 +65,7 @@ export function groupPlugin(): Plugin {
         }
       });
 
-      areaEl.style.display = 'none';
+      setStyle(areaEl, [0, 0, 0, 0, 'none']);
       if (els.length < 2) return;
 
       // 计算组合元素的位置
@@ -87,21 +75,15 @@ export function groupPlugin(): Plugin {
 
       const w = maxX - minX;
       const h = maxY - minY;
-      groupEl.style.width = `${w}px`;
-      groupEl.style.height = `${h}px`;
-      groupEl.style.top = `${minY}px`;
-      groupEl.style.left = `${minX}px`;
+      setStyle(groupEl, [minX, minY, w, h]);
       groupEl.style.display = 'block';
       canvasEl.appendChild(groupEl);
 
       els.forEach((el) => {
         const id = createId();
         const item = el.cloneNode(true) as HTMLElement;
-        const {offsetHeight: height, offsetLeft: left, offsetTop: top, offsetWidth: width} = el as HTMLElement
-        item.style.top = `${(top - minY) / h * 100}%`;
-        item.style.left = `${(left - minX) / w * 100}%`;
-        item.style.width = `${width / w * 100}%`;
-        item.style.height = `${height / h * 100}%`;
+        const { offsetHeight: height, offsetLeft: left, offsetTop: top, offsetWidth: width } = el as HTMLElement;
+        setStyle(item, [`${(left - minX) / w * 100}%`, `${(top - minY) / h * 100}%`, `${width / w * 100}%`, `${height / h * 100}%`]);
         delAttr(item, 'type');
         handleAttr(item, 'groupId', id)
         

@@ -18,7 +18,7 @@ export interface MoveRect {
 }
 export type MoveRectList = MoveRect[];
 
-interface Common {
+export interface Common {
   /** 移动的元素 */
   currentEl: Element | null;
   /** 缩放比例 */
@@ -33,10 +33,6 @@ interface Common {
   eventTarget: HTMLElement;
   /** 元素类型 */
   type: RunTarge | null;
-}
-
-export interface ReturnData extends Common {
-  createEl: () => Element | void;
 }
 
 export interface PluginOptions extends Common {

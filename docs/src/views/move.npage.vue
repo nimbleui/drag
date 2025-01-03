@@ -45,6 +45,7 @@ const getEl = () => warpRef.value!;
 
 const dragData = drag(getEl, {
   scale: 1,
+  limitBoundary: true,
   disabled: (target, id) => id == '3',
   equalRatio: (target, id) => id == '2' ,
   plugins: [

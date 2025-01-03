@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@nimble-ui/drag": "workspace:^",
-    "@nimble-ui/move": "^1.0.0",
+    "@nimble-ui/move": "^1.0.6",
     "vue": "^3.5.6",
     "vue-router": "^4.4.5",
     "pinia": "^2.2.2"

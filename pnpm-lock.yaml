@@ -50,8 +50,8 @@ importers:
         specifier: workspace:^
         version: link:../packages/drag
       '@nimble-ui/move':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.0.6
+        version: 1.0.6
       pinia:
         specifier: ^2.2.2
         version: 2.2.2(typescript@5.7.2)(vue@3.5.6(typescript@5.7.2))
@@ -86,8 +86,8 @@ importers:
         specifier: workspace:^
         version: link:../constant
       '@nimble-ui/move':
-        specifier: ^1.0.4
-        version: 1.0.4
+        specifier: ^1.0.6
+        version: 1.0.6
       '@nimble-ui/utils':
         specifier: workspace:^
         version: link:../utils
@@ -541,11 +541,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@nimble-ui/move@1.0.0':
-    resolution: {integrity: sha512-wLkkeba8eF8kQjvNqUN7sAlPyjBbN7emlol2ObSDHWFoGHyoCvh/OcOyegUp4UH8F/QvrlwYrfXVLVWzWSobJQ==}
-
-  '@nimble-ui/move@1.0.4':
-    resolution: {integrity: sha512-+PCy9pJqc978uttHUTrFdp2zPEbs84N+MgI3tM1N3LbcqoS8J4XjNlD8hjB7vMaVb3jDuSgB9u/cuXod1iiG6g==}
+  '@nimble-ui/move@1.0.6':
+    resolution: {integrity: sha512-XL4KjAjF4X9S4PLvjoWhxDilyZHhhVhRAYWjTBn4N62t1BvZIsBGSk3CxMzxx/imZz+YEkPcQ3vIOLQ+OeE6ZQ==}
 
   '@rollup/plugin-commonjs@28.0.1':
     resolution: {integrity: sha512-+tNWdlWKbpB3WgBN7ijjYkq9X5uhjmcvyjEght4NmH5fAU++zfQzAJ6wumLS+dNcvwEZhKx2Z+skY8m7v0wGSA==}
@@ -1629,9 +1626,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@nimble-ui/move@1.0.0': {}
-
-  '@nimble-ui/move@1.0.4': {}
+  '@nimble-ui/move@1.0.6': {}
 
   '@rollup/plugin-commonjs@28.0.1(rollup@4.27.4)':
     dependencies:

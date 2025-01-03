@@ -6,7 +6,7 @@ import type {
   MoveRectList,
   Plugin,
   PluginOptions,
-  ReturnData,
+  Common,
   SiteInfo,
   EventType,
   HandleEvent,
@@ -17,11 +17,13 @@ import {
   getBoundingClientRectByScale,
   getDOMSite,
   getParentTarget,
+  getRotationDegrees,
   handleAttr,
   isFunction,
   isFunctionOrValue,
   objectTransform,
   selectDOM,
+  setStyle,
 } from '@nimble-ui/utils';
 import { DRAG_TYPE, DRAG_ACTIVE, DRAG_GROUP_ID, DRAG_GROUP } from "@nimble-ui/constant";
 import { createElement } from './createEl';
@@ -178,10 +180,7 @@ function getMoveSite(scale: number, canvasSite: Omit<MoveRect, "el">) {
     const moveEl = selectDOM(document, `[${DRAG_GROUP_ID}='${handleAttr(el, 'groupId')}'][${DRAG_TYPE}='move']`);
     if (!moveEl) return;
     const move = moveEl as HTMLElement;
-    move.style.top = `${values.top}px`;
-    move.style.left = `${values.left}px`;
-    move.style.width = `${values.width}px`;
-    move.style.height = `${values.height}px`;
+    setStyle(move, [values.left, values.top, values.width, values.height])
     move.style.transform = `rotate(${values.angle}deg)`;
 
     result.list.push({ ...values, el: moveEl });
@@ -257,6 +256,19 @@ function bindKeyUp() {
   }
 }
 
+/** 处理八点的显隐 */
+function hidAndVisible(currentEl: Element | null, canvas: Element) {
+  const content = canvas.querySelector('.drag-mask');
+  if (currentEl) {
+    const t = currentEl as HTMLElement;
+    setStyle(content, [t.offsetLeft, t.offsetTop, t.offsetWidth, t.offsetHeight, 'block']);
+    (content as HTMLElement).style.border = '1px solid #1677ff';
+    (content as HTMLElement).style.transform = `rotate(${getRotationDegrees(t)}deg)`;
+  } else {
+    (content as HTMLElement).style.display = 'none'
+  }
+}
+
 const keys = [
   'disX',
   'disY',
@@ -281,10 +293,19 @@ export function drag(el: () => Element, config: ConfigTypes) {
     stop: true,
     prevent: true,
     boundary: limitBoundary ? el : undefined,
+    init(canvas) {
+      createElement({...usePlugins, canvas })
+    },
     changeTarget(el, e) {
       let target = e.target as HTMLElement;
-      const warp = isFunctionOrValue(el);
-      while (target != warp) {
+
+      // 如果是点就获取选中
+      const attr = handleAttr(target, 'type')
+      if (attr == 'dot' || attr == 'rotate') {
+        return selectDOM(el, `[${DRAG_ACTIVE}='true']`) || el
+      }
+
+      while (target != el) {
         if (target.getAttribute(DRAG_TYPE) == 'move') return target;
         if (!target.parentElement) break;
         target = target.parentElement;
@@ -309,12 +330,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       // 点击的元素
       const eventTarget = data.e.target as HTMLElement;
       // 创建点
-      const createEl = createElement({
-        ...usePlugins,
-        target: currentEl,
-        canvas: data.binElement!,
-      });
-      createEl();
+      hidAndVisible(currentEl, data.binElement!)
       events.emit(type, { scale: s, canvasSite }, 'start');
 
       pluginType('down', {
@@ -331,7 +347,6 @@ export function drag(el: () => Element, config: ConfigTypes) {
         keyEqual: keyword.keyEqual,
       });
       done({
-        createEl,
         currentEl,
         scale: s,
         moveSite,
@@ -342,17 +357,17 @@ export function drag(el: () => Element, config: ConfigTypes) {
       })
     },
     move(data) {
-      const down = data.value.down as ReturnData;
+      const down = data.value.down as Common;
       const values = objectTransform(data, keys);
       pluginType('move', { canvasEl: data.binElement!, e: data.e, ...values, ...down, keyEqual: keyword.keyEqual, });
 
-      if (down.currentEl) down.createEl();
+      hidAndVisible(down.currentEl, data.binElement!);
       const { list, obj } = getMoveSite(down.scale, down.canvasSite);
       if (list.length) changeSiteOrSize?.({ list, obj });
       events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite });
     },
     up(data) {
-      const down = data.value.down as ReturnData;
+      const down = data.value.down as Common;
       const values = objectTransform(data, keys);
       pluginType('up', { canvasEl: data.binElement!, e: data.e, ...values, ...down, keyEqual: keyword.keyEqual });
       events.emit(down?.type, { scale: down.scale, canvasSite: down.canvasSite }, "end");
