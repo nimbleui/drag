@@ -4,7 +4,7 @@ import { projRoot } from './utils';
 
 const pkg = {
   name: '@nimble-ui/drag',
-  version: '1.2.5',
+  version: '1.2.7',
   description: 'low code drag',
   author: {
     name: 'Chen Yu Yun',
@@ -25,8 +25,9 @@ const pkg = {
   license: 'MIT',
   main: './lib/drag/index.cjs.js',
   module: './es/drag/index.esm.js',
-  browser: './index.full.min.js',
   types: './types/index.d.ts',
+  unpkg: "./index.full.min.js",
+  jsdelivr: "./index.full.min.js",
   homepage: 'https://github.com/nimbleui/drag',
   bugs: {
     url: 'https://github.com/nimbleui/drag/issues',
@@ -45,7 +46,6 @@ const pkg = {
     '.': {
       import: './es/drag/index.esm.js',
       require: './lib/drag/index.cjs.js',
-      browser: './index.full.min.js',
       types: './types/index.d.ts',
     },
   },
