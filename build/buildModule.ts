@@ -10,7 +10,7 @@ export const buildModules = async () => {
     input: resolve(projRoot, './packages/drag/index.ts'),
     plugins: [
       esbuild({
-        sourceMap: true,
+        sourceMap: false,
         target: 'es2015',
       }),
       resolvePlugin(),
@@ -23,18 +23,18 @@ export const buildModules = async () => {
   await writeBundles(bundle, [
     {
       format: 'esm',
-      dir: resolve(projRoot, './dist/es'),
-      preserveModules: true,
-      sourcemap: true,
-      entryFileNames: `[name].esm.js`,
+      dir: resolve(projRoot, './dist'),
+      preserveModules: false,
+      sourcemap: false,
+      entryFileNames: `index.esm.js`,
     },
     {
       format: 'cjs',
-      dir: resolve(projRoot, './dist/lib'),
+      dir: resolve(projRoot, './dist'),
       exports: 'named',
-      preserveModules: true,
-      sourcemap: true,
-      entryFileNames: `[name].cjs.js`,
+      preserveModules: false,
+      sourcemap: false,
+      entryFileNames: `index.cjs.js`,
     },
   ]);
 };

@@ -16,7 +16,7 @@ export const buildDeclaration = async () => {
   await writeBundles(bundle, [
     {
       format: 'esm',
-      dir: resolve(projRoot, './dist/types'),
+      dir: resolve(projRoot, './dist'),
       sourcemap: false,
     },
   ]);

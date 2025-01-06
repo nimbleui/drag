@@ -23,9 +23,9 @@ const pkg = {
     'nimble-ui',
   ],
   license: 'MIT',
-  main: './lib/drag/index.cjs.js',
-  module: './es/drag/index.esm.js',
-  types: './types/index.d.ts',
+  main: './index.cjs.js',
+  module: './index.esm.js',
+  types: './index.d.ts',
   unpkg: "./index.full.min.js",
   jsdelivr: "./index.full.min.js",
   homepage: 'https://github.com/nimbleui/drag',
@@ -44,9 +44,9 @@ const pkg = {
   },
   exports: {
     '.': {
-      import: './es/drag/index.esm.js',
-      require: './lib/drag/index.cjs.js',
-      types: './types/index.d.ts',
+      import: './index.esm.js',
+      require: './index.cjs.js',
+      types: './index.d.ts',
     },
   },
 };
