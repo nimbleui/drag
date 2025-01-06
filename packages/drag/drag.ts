@@ -367,7 +367,7 @@ export function drag(el: () => Element, config: ConfigTypes) {
       events.emit(down.type, { scale: down.scale, canvasSite: down.canvasSite });
     },
     up(data) {
-      const down = data.value.down as Common;
+      const down = (data.value.down || {}) as Common;
       const values = objectTransform(data, keys);
       pluginType('up', { canvasEl: data.binElement!, e: data.e, ...values, ...down, keyEqual: keyword.keyEqual });
       events.emit(down?.type, { scale: down.scale, canvasSite: down.canvasSite }, "end");

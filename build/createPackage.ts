@@ -4,7 +4,7 @@ import { projRoot } from './utils';
 
 const pkg = {
   name: '@nimble-ui/drag',
-  version: '1.2.7',
+  version: '1.2.8',
   description: 'low code drag',
   author: {
     name: 'Chen Yu Yun',
@@ -40,7 +40,7 @@ const pkg = {
     access: 'public',
   },
   dependencies: {
-    "@nimble-ui/move": "^1.0.6",
+    "@nimble-ui/move": "^1.0.7",
   },
   exports: {
     '.': {

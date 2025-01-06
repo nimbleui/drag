@@ -59,7 +59,7 @@ const list = reactive([
 const warpRef = ref<HTMLElement>()
 const getEl = () => warpRef.value!
 
-const { on } = drag(getEl, {
+const { on, destroy } = drag(getEl, {
   scale: 1,
   disabled: (target, id) => id == '3',
   plugins: [
@@ -82,8 +82,32 @@ on("resize", ({list, obj}) => {
   console.log(obj)
 })
 // 销毁绑定的事件等
-onBeforeUnmount(dragData.destroy)
+onBeforeUnmount(destroy)
 </script>
+<style lang="scss">
+.warp {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  transform: scale(1);
+  transform-origin: left top;
+
+  .move {
+    position: absolute;
+    width: 150px;
+    height: 50px;
+    background-color: red;
+  }
+
+  .content {
+    position: absolute;
+    left: 50px;
+    top: 25px;
+    width: 50%;
+    height: 50%;
+  }
+}
+</style>
 ```
 
 ### 在react中使用

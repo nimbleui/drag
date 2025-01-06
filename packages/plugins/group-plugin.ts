@@ -23,7 +23,7 @@ export function groupPlugin(): Plugin {
       done({ areaEl, x, y });
     },
     move({ disX, disY, funValue }, done) {
-      const { areaEl, x, y } = funValue.down;
+      const { areaEl, x, y } = funValue.down || {};
 
       const width = Math.abs(disX);
       const height = Math.abs(disY);
