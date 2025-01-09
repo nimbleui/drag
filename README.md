@@ -149,8 +149,11 @@ import drag from "@nimble-ui/drag"
 | drag-start   | 拖拽开始      | (data: ChangeParams) => void |
 | drag-end     | 拖拽结束      | (data: ChangeParams) => void |
 | resize       | 缩放中        | (data: ChangeParams) => void |
-| resize-start | 旋转开始      | (data: ChangeParams) => void |
-| resize-end   | 旋转结束      | (data: ChangeParams) => void |
+| resize-start | 缩放开始      | (data: ChangeParams) => void |
+| resize-end   | 缩放结束      | (data: ChangeParams) => void |
+| rotate       | 旋转中        | (data: ChangeParams) => void |
+| rotate-start | 旋转开始      | (data: ChangeParams) => void |
+| rotate-end   | 旋转结束      | (data: ChangeParams) => void |
 
 #### ChangeParams类型
 ```ts
